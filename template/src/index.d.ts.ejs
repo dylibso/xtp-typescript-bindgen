@@ -1,0 +1,5 @@
+declare module 'main' {
+<% ctx.exports.forEach(ex => { -%>
+  export function <%= ex.name %>(): I32;
+<% }) -%>
+}

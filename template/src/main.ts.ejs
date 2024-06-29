@@ -15,3 +15,11 @@ import {
 <% } %>
 
 
+<% ctx.schema.exports.forEach(ex => { %>
+export function <%= ex.name %>Impl(<%= ex.input ? `input: ${toTypeScriptType(ex.input)}` : "" %>)<%= ex.output ? `:${toTypeScriptType(ex.output)}` : "" %> {
+  // TODO: fill out your implementation here
+  throw new Error("Function not implemented.");
+}
+<% }) %>
+
+

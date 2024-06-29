@@ -4,28 +4,32 @@ const hostFunctions = Host.getFunctions()
 
 <% Object.values(ctx.schema.schemas).forEach(schema => { %>
   <% if (schema.properties) { %>
-    /**
-     * <%= schema.description %>
-     */
-    export class <%= schema.name %> {
-      <% schema.properties.forEach(property => { %>
-        <% if (property.description) { %>
-        /**
-         * <%= property.description %>
-         */
-        <% } %>
-        <%= property.name %>?: <%= toTypeScriptType(property) %>;
-      <% }) %>
-    }
+
+/**
+ * <%= schema.description %>
+ */
+export class <%= schema.name %> {
+  <% schema.properties.forEach(property => { %>
+    <% if (property.description) { %>
+
+  /**
+   * <%= property.description %>
+   */
+  <% } -%>
+  <%= property.name %>?: <%= toTypeScriptType(property) %>;
+  <% }) %>
+}
   <% } else if (schema.enum) { %>
-    /**
-     * <%= schema.description %>
-     */
-    export enum <%= schema.name %> {
-      <% schema.enum.forEach(variant => { %>
-        <%= variant %> = "<%= variant %>",
-      <% }) %>
-    }
+
+/**
+ * <%= schema.description %>
+ */
+export enum <%= schema.name %> {
+  <% schema.enum.forEach(variant => { %>
+    <%= variant %> = "<%= variant %>",
+  <% }) -%>
+}
+
   <% } %>
 
 <% }) %>

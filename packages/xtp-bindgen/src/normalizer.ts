@@ -74,7 +74,7 @@ function parseSchemaRef(ref: string): string {
 function normalizeV1Schema(parsed: parser.V1Schema): XtpSchema {
   const version = 'v1'
   const exports: Export[] = []
-  const imports: Import[] = parsed.imports || []
+  const imports: Import[] = []
   const schemas: Schemas = {}
 
   // need to index all the schemas first

@@ -1,7 +1,7 @@
 import * as main from "./main"
 
 <% ctx.schema.exports.forEach(ex => { -%>
-export function <%= ex.name %>() {
+export function <%= ex.name %>(): number {
   <% if (ex.input) { -%>
     <% if (ex.input.contentType === 'application/json') { -%>
       const input: <%= ex.input.type %> = JSON.parse(Host.inputString())

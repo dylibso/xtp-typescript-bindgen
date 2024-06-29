@@ -1,0 +1,43 @@
+<% if (ctx.schema.imports.length > 0) { %>
+const hostFunctions = Host.getFunctions()
+<% } %>
+
+<% Object.values(ctx.schema.schemas).forEach(schema => { %>
+  <% if (schema.properties) { %>
+    /**
+     * <%= schema.description %>
+     */
+    export class <%= schema.name %> {
+      <% schema.properties.forEach(property => { %>
+        <% if (property.description) { %>
+        /**
+         * <%= property.description %>
+         */
+        <% } %>
+        <%= property.name %>?: <%= toTypeScriptType(property) %>;
+      <% }) %>
+    }
+  <% } else if (schema.enum) { %>
+    /**
+     * <%= schema.description %>
+     */
+    export enum <%= schema.name %> {
+      <% schema.enum.forEach(variant => { %>
+        <%= variant %> = "<%= variant %>",
+      <% }) %>
+    }
+  <% } %>
+
+<% }) %>
+
+
+<% ctx.schema.imports.forEach(imp => { %>
+  export function <%= imp.name %>(input:<%= imp.input ? toTypeScriptType(imp.input) : 'any' %>) <%= imp.output ? `:${toTypeScriptType(imp.output)}` : null %> {
+    const json = JSON.stringify(input);
+
+    const mem = Memory.fromString(json);
+    const ptr = hostFunctions.<%= imp.name %>(mem.offset);
+
+    return JSON.parse(Memory.find(ptr).readString());
+  }
+<% }) %>

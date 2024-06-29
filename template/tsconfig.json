@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "target": "ES2020", // Matches the esbuild target
+    "module": "CommonJS", // Matches the esbuild format
+    "outDir": "./dist", // Output directory for compiled files
+    "sourceMap": true, // Enable source maps
+    "strict": true, // Enable strict type-checking options
+    "esModuleInterop": true, // Allows default imports from commonjs modules
+    "skipLibCheck": true, // Skip type checking of all declaration files
+    "forceConsistentCasingInFileNames": true, // Ensure file casing consistency
+    "moduleResolution": "node", // Specifies module resolution strategy
+    "lib": [
+      "ES2020"
+    ], // Specify library files to be included in the compilation
+    "allowSyntheticDefaultImports": true, // Allow default imports from modules with no default export
+    "declaration": true, // Generates corresponding '.d.ts' file
+    "declarationMap": true, // Generates a sourcemap for each corresponding '.d.ts' file.
+    "noImplicitAny": true, // Raise error on expressions and declarations with an implied 'any' type
+    "resolveJsonModule": true // Include modules imported with .json extension
+  },
+  "include": [
+    "src/**/*"
+  ], // Specify files to include in the compilation
+  "exclude": [
+    "node_modules",
+    "dist"
+  ] // Specify files to exclude from the compilation
+}

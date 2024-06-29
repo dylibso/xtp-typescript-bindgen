@@ -65,7 +65,7 @@ export interface Schema {
 }
 
 export type XtpType =
-  'integer' | 'string' | 'number' | 'boolean' | 'object' | 'array';
+  'integer' | 'string' | 'number' | 'boolean' | 'object' | 'array' | 'buffer';
 export type XtpFormat =
   'int32' | 'int64' | 'float' | 'double' | 'date' | 'date-time' | 'byte';
 

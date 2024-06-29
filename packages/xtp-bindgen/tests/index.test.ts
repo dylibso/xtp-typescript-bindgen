@@ -127,7 +127,7 @@ test('parse-v1-document', () => {
   expect(doc.version).toBe('v1')
   expect(Object.keys(doc.schemas).length).toBe(3)
   expect(doc.exports.length).toBe(3)
-  expect(doc.imports.length).toBe(2)
+  expect(doc.imports.length).toBe(1)
 
   const enumSchema1 = doc.schemas['Fruit']
   expect(enumSchema1.enum).toStrictEqual(testSchema.schemas[0].enum)
@@ -139,6 +139,5 @@ test('parse-v1-document', () => {
   const properties = schema3.properties
   // proves we derferenced it
   expect((properties[0] as Schema).enum).toStrictEqual(testSchema.schemas[1].enum)
-
-
+  expect(properties[0].name).toStrictEqual('GhostGang')
 })

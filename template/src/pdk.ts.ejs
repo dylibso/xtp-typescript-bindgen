@@ -25,7 +25,7 @@ export class <%= schema.name %> {
  * <%= schema.description %>
  */
 export enum <%= schema.name %> {
-  <% schema.enum.forEach(variant => { %>
+  <% schema.enum.forEach(variant => { -%>
     <%= variant %> = "<%= variant %>",
   <% }) -%>
 }

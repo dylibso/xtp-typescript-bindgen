@@ -1,16 +1,16 @@
 <% if (Object.values(ctx.schema.schemas).length > 0) { %>
 import {
-  <% Object.values(ctx.schema.schemas).forEach(schema => { %>
+  <% Object.values(ctx.schema.schemas).forEach(schema => { -%>
     <%= schema.name %>,
-  <% }) %>
+  <% }) -%>
 } from './pdk'
 <% } %>
 
 <% if (ctx.schema.imports.length > 0) { %>
 import {
-  <% ctx.schema.imports.forEach(imp => { %>
+  <% ctx.schema.imports.forEach(imp => { -%>
     <%= imp.name %>,
-  <% }) %>
+  <% }) -%>
 } from './pdk'
 <% } %>
 

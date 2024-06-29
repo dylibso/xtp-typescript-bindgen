@@ -1,13 +1,9 @@
 import * as main from './main'
 
 import {
-
   Fruit,
-
   GhostGang,
-
   ComplexObject
-
 } from './pdk'
 
 export function voidFunc (): number {

@@ -5,13 +5,9 @@ const hostFunctions = Host.getFunctions()
  * A set of available fruits you can consume
  */
 export enum Fruit {
-
   apple = 'apple',
-
   orange = 'orange',
-
   banana = 'banana',
-
   strawberry = 'strawberry',
 }
 
@@ -19,13 +15,9 @@ export enum Fruit {
  * A set of all the enemies of pac-man
  */
 export enum GhostGang {
-
   blinky = 'blinky',
-
   pinky = 'pinky',
-
   inky = 'inky',
-
   clyde = 'clyde',
 }
 

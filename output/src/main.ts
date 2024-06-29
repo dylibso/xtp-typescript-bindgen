@@ -1,12 +1,9 @@
 
 import {
-
   Fruit,
-
   GhostGang,
-
-  ComplexObject,
-
+  ComplexObject
+  ,
   eatAFruit
 } from './pdk'
 

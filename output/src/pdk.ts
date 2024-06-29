@@ -65,6 +65,8 @@ export function eatAFruit (input: Fruit): boolean {
   const json = JSON.stringify(input)
 
   const mem = Memory.fromString(json)
+  // TODO why?
+  // @ts-expect-error
   const ptr = hostFunctions.eatAFruit(mem.offset)
 
   return JSON.parse(Memory.find(ptr).readString())

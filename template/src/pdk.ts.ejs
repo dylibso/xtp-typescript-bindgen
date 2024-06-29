@@ -40,6 +40,8 @@ export enum <%= schema.name %> {
     const json = JSON.stringify(input);
 
     const mem = Memory.fromString(json);
+    // TODO why?
+    // @ts-ignore
     const ptr = hostFunctions.<%= imp.name %>(mem.offset);
 
     return JSON.parse(Memory.find(ptr).readString());

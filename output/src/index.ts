@@ -1,13 +1,23 @@
 import * as main from './main'
 
-export function voidFunc(): number {
+import {
+
+  Fruit,
+
+  GhostGang,
+
+  ComplexObject
+
+} from './pdk'
+
+export function voidFunc (): number {
   main.voidFuncImpl()
 
   return 0
 }
 
-export function primitiveTypeFunc(): number {
-  const input: string = Host.inputString()
+export function primitiveTypeFunc (): number {
+  const input = Host.inputString()
 
   const output = main.primitiveTypeFuncImpl(input)
 
@@ -16,8 +26,8 @@ export function primitiveTypeFunc(): number {
   return 0
 }
 
-export function referenceTypeFunc(): number {
-  const input: string = Host.inputString()
+export function referenceTypeFunc (): number {
+  const input = Host.inputString() as Fruit
 
   const output = main.referenceTypeFuncImpl(input)
 

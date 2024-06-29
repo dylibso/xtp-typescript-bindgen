@@ -1,4 +1,11 @@
 import * as main from "./main"
+<% if (Object.values(ctx.schema.schemas).length > 0) { %>
+import {
+  <% Object.values(ctx.schema.schemas).forEach(schema => { %>
+    <%= schema.name %>,
+  <% }) %>
+} from './pdk'
+<% } %>
 
 <% ctx.schema.exports.forEach(ex => { -%>
 export function <%= ex.name %>(): number {
@@ -6,7 +13,7 @@ export function <%= ex.name %>(): number {
     <% if (ex.input.contentType === 'application/json') { -%>
       const input: <%= toTypeScriptType(ex.input) %> = JSON.parse(Host.inputString())
     <% } else if (ex.input.type === 'string') { -%>
-      const input: string = Host.inputString()
+      const input = Host.inputString() <%= (ex.input.$ref && ex.input.$ref.enum) ? `as ${ex.input.$ref.name}` : "" %>
     <% } else { -%>
       const input: ArrayBufferLike = Host.inputBytes()
     <% } -%>

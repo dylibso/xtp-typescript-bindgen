@@ -4,13 +4,14 @@
   "description": "<%= ctx.project.description %>",
   "main": "src/index.ts",
   "scripts": {
-    "build": "node esbuild.js && extism-js dist/index.js -i src/index.d.ts -o dist/plugin.wasm",
+    "build": "tsc --noEmit && node esbuild.js && extism-js dist/index.js -i src/index.d.ts -o dist/plugin.wasm",
     "format": "ts-standard src/**/*.ts --fix"
   },
   "keywords": [],
   "author": "",
   "license": "BSD-3-Clause",
   "devDependencies": {
+    "@extism/js-pdk": "^1.0.1",
     "esbuild": "^0.19.6",
     "typescript": "^5.3.2",
     "ts-standard": "^12.0.0"

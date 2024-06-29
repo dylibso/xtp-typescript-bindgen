@@ -78,7 +78,10 @@ export interface Property {
   minimum?: number;
   maximum?: number;
   default?: string;
-  "$ref"?: string;
+
+  // NOTE: needs to be any to satisfy type satisfy
+  // type system in normalizer
+  "$ref"?: any;
 }
 
 class ParseError extends Error {

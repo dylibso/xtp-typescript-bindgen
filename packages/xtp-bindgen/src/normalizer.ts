@@ -1,12 +1,14 @@
 import * as parser from "./parser"
 
-type SchemaOrProperty = Schema | Property;
-
-export interface Schema extends Omit<parser.Schema, 'properties'> {
-  properties: SchemaOrProperty[];
+export interface Property extends Omit<parser.Property, '$ref'> {
+  '$ref': Schema | null
 }
 
-export type Schemas = {
+export interface Schema extends Omit<parser.Schema, 'properties'> {
+  properties: Property[];
+}
+
+export type SchemaMap = {
   [key: string]: Schema;
 }
 
@@ -15,22 +17,20 @@ export interface XtpSchema {
   version: Version;
   exports: Export[];
   imports: Import[];
-  schemas: Schemas;
+  schemas: SchemaMap;
 }
 
 export type Version = 'v0' | 'v1';
 export type XtpType = parser.XtpType
 export type XtpFormat = parser.XtpFormat
 export type MimeType = parser.MimeType
-export type Property = parser.Property
-//export type Export = parser.Export
 
 export interface Export {
   name: string;
   description?: string;
   codeSamples?: parser.CodeSample[];
-  input?: Schema | Property;
-  output?: Schema | Property;
+  input?: Property;
+  output?: Property;
 }
 
 // These are the same for now
@@ -71,11 +71,18 @@ function parseSchemaRef(ref: string): string {
   return parts[2]
 }
 
+function normalizeProp(p: Property, s: Schema) {
+  p.$ref = s
+  p.type = s.type || 'string' // TODO: revisit string default, isn't type required?
+  p.contentType = p.contentType || s.contentType
+  p.description = p.description || s.description
+}
+
 function normalizeV1Schema(parsed: parser.V1Schema): XtpSchema {
   const version = 'v1'
   const exports: Export[] = []
   const imports: Import[] = []
-  const schemas: Schemas = {}
+  const schemas: SchemaMap = {}
 
   // need to index all the schemas first
   parsed.schemas?.forEach(s => {
@@ -86,8 +93,11 @@ function normalizeV1Schema(parsed: parser.V1Schema): XtpSchema {
   parsed.schemas?.forEach(s => {
     s.properties?.forEach((p, idx) => {
       if (p.$ref) {
-        // over-write the property with a reference to the schema
-        schemas[s.name].properties[idx] = schemas[parseSchemaRef(p.$ref)]
+        // link the property with a reference to the schema
+        normalizeProp(
+          schemas[s.name].properties[idx],
+          schemas[parseSchemaRef(p.$ref)]
+        )
       }
     })
   })
@@ -98,11 +108,17 @@ function normalizeV1Schema(parsed: parser.V1Schema): XtpSchema {
       // they have the same type
       // deref input and output
       const normEx = ex as Export
-      if (ex.input?.$ref) {
-        normEx.input = schemas[parseSchemaRef(ex.input.$ref)]
+      if (ex.input && ex.input?.$ref) {
+        normalizeProp(
+          normEx.input!,
+          schemas[parseSchemaRef(ex.input.$ref)]
+        )
       }
       if (ex.output?.$ref) {
-        normEx.output = schemas[parseSchemaRef(ex.output.$ref)]
+        normalizeProp(
+          normEx.output!,
+          schemas[parseSchemaRef(ex.output.$ref)]
+        )
       }
       exports.push(normEx)
     } else if (parser.isSimpleExport(ex)) {
@@ -119,10 +135,16 @@ function normalizeV1Schema(parsed: parser.V1Schema): XtpSchema {
     const normIm = im as Import
     // deref input and output
     if (im.input?.$ref) {
-      normIm.input = schemas[parseSchemaRef(im.input.$ref)]
+      normalizeProp(
+        normIm.input!,
+        schemas[parseSchemaRef(im.input.$ref)]
+      )
     }
     if (im.output?.$ref) {
-      normIm.output = schemas[parseSchemaRef(im.output.$ref)]
+      normalizeProp(
+        normIm.output!,
+        schemas[parseSchemaRef(im.output.$ref)]
+      )
     }
     imports.push(normIm)
   })

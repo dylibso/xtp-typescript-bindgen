@@ -1,3 +1,4 @@
+
 const hostFunctions = Host.getFunctions()
 
 /**
@@ -33,9 +34,9 @@ export enum GhostGang {
  */
 export class ComplexObject {
   /**
-   * A set of all the enemies of pac-man
+   * I can override the description for the property here
    */
-  GhostGang?: string
+  ghost?: GhostGang
 
   /**
    * A boolean prop
@@ -60,7 +61,7 @@ this for you.
   anOptionalDate?: string
 }
 
-export function eatAFruit(input: string): boolean {
+export function eatAFruit (input: Fruit): boolean {
   const json = JSON.stringify(input)
 
   const mem = Memory.fromString(json)

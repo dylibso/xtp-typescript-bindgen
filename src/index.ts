@@ -8,8 +8,7 @@ function getContext() {
 }
 
 function toTypeScriptType(property) {
-  if (!property.type) return "string"
-  if (property.enum) return property.name
+  if (property.$ref) return property.$ref.name
 
   switch (property.type) {
     case "string":

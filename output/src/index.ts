@@ -1,12 +1,12 @@
 import * as main from './main'
 
-export function voidFunc (): number {
+export function voidFunc(): number {
   main.voidFuncImpl()
 
   return 0
 }
 
-export function primitiveTypeFunc (): number {
+export function primitiveTypeFunc(): number {
   const input: string = Host.inputString()
 
   const output = main.primitiveTypeFuncImpl(input)
@@ -16,8 +16,8 @@ export function primitiveTypeFunc (): number {
   return 0
 }
 
-export function referenceTypeFunc (): number {
-  const input: ArrayBufferLike = Host.inputBytes()
+export function referenceTypeFunc(): number {
+  const input: string = Host.inputString()
 
   const output = main.referenceTypeFuncImpl(input)
 

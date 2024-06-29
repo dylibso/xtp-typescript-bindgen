@@ -1,20 +1,16 @@
 import ejs from 'ejs'
+import { parse } from "xtp-bindgen"
 
 function getContext() {
-  return JSON.parse(Config.get('ctx'))
-}
-
-// TODO we'll include a bunch of helper functions or methods
-// in a separate package. 
-function isJson(func) {
-  return func.contentType === 'application/json'
+  const ctx = JSON.parse(Config.get('ctx'))
+  ctx.schema = parse(JSON.stringify(ctx.schema))
+  return ctx
 }
 
 export function render() {
   const tmpl = Host.inputString()
   const ctx = {
-    ctx: getContext(),
-    isJson,
+    ctx: getContext()
   }
   const output = ejs.render(tmpl, ctx)
   Host.outputString(output)

@@ -1,4 +1,5 @@
 const esbuild = require('esbuild');
+const dummyResolves = /(^fs|^path)$/
 
 esbuild
   .build({
@@ -16,7 +17,7 @@ esbuild
       {
         name: 'stub-ejs-deps',
         setup(build) {
-          build.onResolve({ filter: /(^fs|^path)$/ }, args => {
+          build.onResolve({ filter: dummyResolves }, args => {
             return { path: require.resolve('./dummy.js') }
           });
         },

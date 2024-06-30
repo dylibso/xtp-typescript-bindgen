@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 
 mkdir bundle
 cp -R template/ bundle/template

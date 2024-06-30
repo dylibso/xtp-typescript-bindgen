@@ -6,7 +6,7 @@ on:
       - created
 
 jobs:
-  build:
+  build-and-release:
     runs-on: ubuntu-latest
 
     steps:
@@ -34,26 +34,6 @@ jobs:
 
       - name: Run bundle script
         run: ./bundle.sh
-
-      - name: Upload bundle.zip as a build artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: bundle
-          path: bundle.zip
-
-  upload-release-asset:
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Download artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: bundle
-          path: .
 
       - name: Upload release asset
         uses: actions/upload-release-asset@v1

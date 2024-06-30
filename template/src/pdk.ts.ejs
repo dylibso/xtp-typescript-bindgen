@@ -9,14 +9,15 @@ const hostFunctions = Host.getFunctions()
  * <%= schema.description %>
  */
 export class <%= schema.name %> {
-  <% schema.properties.forEach(property => { %>
-    <% if (property.description) { %>
+  <% schema.properties.forEach(p => { %>
+    <% if (p.description) { %>
 
   /**
-   * <%= property.description %>
+   * <%= p.description %>
    */
   <% } -%>
-  <%= property.name %>?: <%= toTypeScriptType(property) %>;
+  <%= p.nullable ? '' : '// @ts-expect-error TS2564\n' -%>
+  <%= p.name %><%= p.nullable ? '?' : '' %>: <%= toTypeScriptType(p) %>;
   <% }) %>
 }
   <% } else if (schema.enum) { %>

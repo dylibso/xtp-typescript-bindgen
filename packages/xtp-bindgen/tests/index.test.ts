@@ -137,9 +137,15 @@ test('parse-v1-document', () => {
 
   const schema3 = doc.schemas['ComplexObject']
   const properties = schema3.properties
+
   // proves we derferenced it
   expect(properties[0].$ref?.enum).toStrictEqual(testSchema.schemas[1].enum)
   expect(properties[0].$ref?.name).toBe('GhostGang')
   expect(properties[0].name).toBe('ghost')
-  expect(properties[0].contentType).toBe('application/json')
+
+  const exp = doc.exports[2]
+  // proves we derferenced it
+  expect(exp.input?.$ref?.enum).toStrictEqual(testSchema.schemas[0].enum)
+  expect(exp.output?.$ref?.contentType).toBe('application/json')
+  expect(exp.output?.contentType).toBe('application/json')
 })

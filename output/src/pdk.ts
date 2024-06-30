@@ -28,22 +28,26 @@ export class ComplexObject {
   /**
    * I can override the description for the property here
    */
-  ghost?: GhostGang
+  // @ts-expect-error TS2564
+  ghost: GhostGang
 
   /**
    * A boolean prop
    */
-  aBoolean?: boolean
+  // @ts-expect-error TS2564
+  aBoolean: boolean
 
   /**
    * An int prop
    */
-  aString?: number
+  // @ts-expect-error TS2564
+  aString: number
 
   /**
    * An int prop
    */
-  anInt?: number
+  // @ts-expect-error TS2564
+  anInt: number
 
   /**
    * A datetime object, we will automatically serialize and deserialize

@@ -1,7 +1,8 @@
 import * as parser from "./parser"
 
 export interface Property extends Omit<parser.Property, '$ref'> {
-  '$ref': Schema | null
+  '$ref': Schema | null;
+  nullable: boolean;
 }
 
 export interface Schema extends Omit<parser.Schema, 'properties'> {
@@ -92,13 +93,18 @@ function normalizeV1Schema(parsed: parser.V1Schema): XtpSchema {
   // denormalize all the properties in a second loop
   parsed.schemas?.forEach(s => {
     s.properties?.forEach((p, idx) => {
+      // link the property with a reference to the schema if it has a ref
       if (p.$ref) {
-        // link the property with a reference to the schema
         normalizeProp(
           schemas[s.name].properties[idx],
           schemas[parseSchemaRef(p.$ref)]
         )
       }
+
+      // add set nullable property from the required array
+      // TODO: consider supporting nullable instead of required
+      // @ts-ignore
+      p.nullable = !s.required?.includes(p.name)
     })
   })
 

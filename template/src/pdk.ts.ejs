@@ -6,14 +6,14 @@ const hostFunctions = Host.getFunctions()
   <% if (schema.properties) { %>
 
 /**
- * <%= schema.description %>
+ * <%= formatBlockComment(schema.description) %>
  */
 export class <%= schema.name %> {
   <% schema.properties.forEach(p => { %>
     <% if (p.description) { %>
 
   /**
-   * <%= p.description %>
+   * <%= formatBlockComment(p.description) %>
    */
   <% } -%>
   <%= p.nullable ? '' : '// @ts-expect-error TS2564\n' -%>
@@ -23,7 +23,7 @@ export class <%= schema.name %> {
   <% } else if (schema.enum) { %>
 
 /**
- * <%= schema.description %>
+ * <%= formatComment(schema.description) %>
  */
 export enum <%= schema.name %> {
   <% schema.enum.forEach(variant => { -%>
@@ -37,14 +37,25 @@ export enum <%= schema.name %> {
 
 
 <% schema.imports.forEach(imp => { %>
-  export function <%= imp.name %>(input:<%= imp.input ? toTypeScriptType(imp.input) : 'any' %>) <%= imp.output ? `:${toTypeScriptType(imp.output)}` : null %> {
-    const json = JSON.stringify(input);
+<% if (exportHasComment(imp)) -%>
+/**
+ * <%= formatBlockComment(imp.description) %>
+ *
+<% if (propertyHasComment(imp.input)) { -%>
+ * @param input {<%= toTypeScriptType(imp.input) %>} <%= formatComment(imp.input.description) %>
+<% } -%>
+<% if (propertyHasComment(imp.output)) { -%>
+ * @returns {<%= toTypeScriptType(imp.output) %>} <%= formatComment(imp.output.description) %>
+<% } -%>
+ */
+export function <%= imp.name %>(input:<%= imp.input ? toTypeScriptType(imp.input) : 'any' %>) <%= imp.output ? `:${toTypeScriptType(imp.output)}` : null %> {
+  const json = JSON.stringify(input);
 
-    const mem = Memory.fromString(json);
-    // TODO why?
-    // @ts-ignore
-    const ptr = hostFunctions.<%= imp.name %>(mem.offset);
+  const mem = Memory.fromString(json);
+  // TODO why?
+  // @ts-ignore
+  const ptr = hostFunctions.<%= imp.name %>(mem.offset);
 
-    return JSON.parse(Memory.find(ptr).readString());
-  }
+  return JSON.parse(Memory.find(ptr).readString());
+}
 <% }) %>

@@ -5,7 +5,6 @@ import {
   <% }) -%>
 } from './pdk'
 <% } %>
-
 <% if (schema.imports.length > 0) { %>
 import {
   <% schema.imports.forEach(imp => { -%>
@@ -16,6 +15,18 @@ import {
 
 
 <% schema.exports.forEach(ex => { %>
+<% if (exportHasComment(ex)) -%>
+/**
+ * <%= formatBlockComment(ex.description) %>
+ *
+<% if (propertyHasComment(ex.input)) { -%>
+ * @param input {<%= toTypeScriptType(ex.input) %>} <%= formatComment(ex.input.description) %>
+<% } -%>
+<% if (propertyHasComment(ex.output)) { -%>
+ * @returns {<%= toTypeScriptType(ex.output) %>} <%= formatComment(ex.output.description) %>
+<% } -%>
+ */
+<% -%>
 export function <%= ex.name %>Impl(<%= ex.input ? `input: ${toTypeScriptType(ex.input)}` : "" %>)<%= ex.output ? `:${toTypeScriptType(ex.output)}` : "" %> {
   // TODO: fill out your implementation here
   throw new Error("Function not implemented.");

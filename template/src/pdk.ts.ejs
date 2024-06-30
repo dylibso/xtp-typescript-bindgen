@@ -1,8 +1,8 @@
-<% if (ctx.schema.imports.length > 0) { %>
+<% if (schema.imports.length > 0) { %>
 const hostFunctions = Host.getFunctions()
 <% } %>
 
-<% Object.values(ctx.schema.schemas).forEach(schema => { %>
+<% Object.values(schema.schemas).forEach(schema => { %>
   <% if (schema.properties) { %>
 
 /**
@@ -36,7 +36,7 @@ export enum <%= schema.name %> {
 <% }) %>
 
 
-<% ctx.schema.imports.forEach(imp => { %>
+<% schema.imports.forEach(imp => { %>
   export function <%= imp.name %>(input:<%= imp.input ? toTypeScriptType(imp.input) : 'any' %>) <%= imp.output ? `:${toTypeScriptType(imp.output)}` : null %> {
     const json = JSON.stringify(input);
 

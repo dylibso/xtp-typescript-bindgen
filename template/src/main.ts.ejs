@@ -1,21 +1,21 @@
-<% if (Object.values(ctx.schema.schemas).length > 0) { %>
+<% if (Object.values(schema.schemas).length > 0) { %>
 import {
-  <% Object.values(ctx.schema.schemas).forEach(schema => { -%>
+  <% Object.values(schema.schemas).forEach(schema => { -%>
     <%= schema.name %>,
   <% }) -%>
 } from './pdk'
 <% } %>
 
-<% if (ctx.schema.imports.length > 0) { %>
+<% if (schema.imports.length > 0) { %>
 import {
-  <% ctx.schema.imports.forEach(imp => { -%>
+  <% schema.imports.forEach(imp => { -%>
     <%= imp.name %>,
   <% }) -%>
 } from './pdk'
 <% } %>
 
 
-<% ctx.schema.exports.forEach(ex => { %>
+<% schema.exports.forEach(ex => { %>
 export function <%= ex.name %>Impl(<%= ex.input ? `input: ${toTypeScriptType(ex.input)}` : "" %>)<%= ex.output ? `:${toTypeScriptType(ex.output)}` : "" %> {
   // TODO: fill out your implementation here
   throw new Error("Function not implemented.");

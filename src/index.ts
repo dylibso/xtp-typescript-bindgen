@@ -20,6 +20,7 @@ function toTypeScriptType(property: Property) {
     case "object":
       return "any"
     case "array":
+      // TODO respect items
       return "any[]"
     case "buffer":
       return "ArrayBufferLike"
@@ -31,7 +32,7 @@ function toTypeScriptType(property: Property) {
 export function render() {
   const tmpl = Host.inputString()
   const ctx = {
-    ctx: getContext(),
+    ...getContext(),
     toTypeScriptType,
   }
   const output = ejs.render(tmpl, ctx)

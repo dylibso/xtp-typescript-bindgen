@@ -1,5 +1,5 @@
 declare module 'main' {
-<% ctx.schema.exports.forEach(ex => { -%>
+<% schema.exports.forEach(ex => { -%>
   export function <%= ex.name %>(): I32;
 <% }) -%>
 }

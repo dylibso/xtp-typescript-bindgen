@@ -27,7 +27,7 @@ import {
 <% } -%>
  */
 <% -%>
-export function <%= ex.name %>Impl(<%= ex.input ? `input: ${toTypeScriptType(ex.input)}` : "" %>)<%= ex.output ? `:${toTypeScriptType(ex.output)}` : "" %> {
+export function <%= ex.name %>Impl(<%= propertyIsEmpty(ex.input) ? "" : `input: ${toTypeScriptType(ex.input)}` %>)<%= propertyIsEmpty(ex.output) ? "" : `:${toTypeScriptType(ex.output)}` %> {
   // TODO: fill out your implementation here
   throw new Error("Function not implemented.");
 }

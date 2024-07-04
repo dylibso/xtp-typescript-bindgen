@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/extism/go-sdk"
+	extism "github.com/extism/go-sdk"
 )
 
 // TODO this is wonk
@@ -47,12 +47,14 @@ func CopyFile(src, dst string) error {
 func main() {
 	schemaCtx := `
   {
-    "project": {"name": "hello", "description": "a new plugin that does something"},
+    "project": {"name": "hello", "description": "a new plugin that does something", "appId": "app_1234", "extensionPointId": "ext_1234" },
     "schema": {
     "exports": [
       {
         "name": "voidFunc",
-        "description": "This demonstrates how you can create an export with\nno inputs or outputs.\n"
+        "description": "This demonstrates how you can create an export with\nno inputs or outputs.\n",
+        "input": { "name": "" },
+        "output": { "name": "" }
       },
       {
         "name": "primitiveTypeFunc",

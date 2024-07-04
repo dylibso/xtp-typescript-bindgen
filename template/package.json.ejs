@@ -4,8 +4,8 @@
   "description": "<%= project.description %>",
   "main": "src/index.ts",
   "scripts": {
-    "build": "tsc --noEmit && node esbuild.js && extism-js dist/index.js -i src/index.d.ts -o dist/plugin.wasm",
-    "format": "prettier --write \"src/**/*.{ts,tsx}\""
+    "build": "npx tsc --noEmit && node esbuild.js && extism-js dist/index.js -i src/index.d.ts -o dist/plugin.wasm",
+    "format": "npx prettier --write \"src/**/*.{ts,tsx}\""
   },
   "keywords": [],
   "author": "",

@@ -3,7 +3,6 @@ import { parse, Export, Property } from "xtp-bindgen"
 
 function getContext() {
   const ctx = JSON.parse(Config.get('ctx') || '{}')
-  ctx.schema = parse(JSON.stringify(ctx.schema))
   return ctx
 }
 

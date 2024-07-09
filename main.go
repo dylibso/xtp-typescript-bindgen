@@ -47,6 +47,8 @@ func CopyFile(src, dst string) error {
 func main() {
 	schemaCtx := `
   {
+  "project": {"name": "hello", "description": "a new plugin that does something", "appId": "app_1234", "extensionPointId": "ext_1234" },
+  "schema": {
   "exports": [
     {
       "name": "voidFunc",
@@ -198,6 +200,7 @@ func main() {
     }
   ],
   "version": "v1-draft"
+  }
 }
   `
 

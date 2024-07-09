@@ -1,7 +1,7 @@
 const esbuild = require('esbuild');
 const dummyResolves = /(^fs|^path)$/
-esbuild
 
+esbuild
   .build({
     entryPoints: ['src/index.ts'],
     outdir: 'dist',

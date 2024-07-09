@@ -29,11 +29,6 @@ function toTypeScriptType(property: Property) {
   }
 }
 
-function propertyIsEmpty(p: Property | null) {
-  if (!p) return true
-  return !p.type && !p.$ref
-}
-
 function propertyHasComment(p: Property | null) {
   if (!p) return false
   return p.description || p.$ref
@@ -61,7 +56,6 @@ export function render() {
     ...getContext(),
     toTypeScriptType,
     propertyHasComment,
-    propertyIsEmpty,
     exportHasComment,
     formatBlockComment,
     formatComment,

@@ -1,5 +1,5 @@
 import ejs from 'ejs'
-import { parse, Export, Property } from "xtp-bindgen"
+import { parse, Export, Property } from "@dylibso/xtp-bindgen"
 
 function getContext() {
   const ctx = JSON.parse(Config.get('ctx') || '{}')

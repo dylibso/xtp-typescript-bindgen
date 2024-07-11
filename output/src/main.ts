@@ -1,17 +1,6 @@
+import { WriteParams, Fruit, GhostGang, ComplexObject } from "./pdk";
 
-import {
-      Fruit,
-      GhostGang,
-      ComplexObject,
-  } from './pdk'
-
-
-import {
-      eatAFruit,
-  } from './pdk'
-
-
-
+import { eatAFruit, kv_read, kv_write } from "./pdk";
 
 /**
  * This demonstrates how you can create an export with
@@ -30,7 +19,7 @@ export function voidFuncImpl() {
  * @param input {string} A string passed into plugin input
  * @returns {boolean} A boolean encoded as json
  */
-export function primitiveTypeFuncImpl(input: string):boolean {
+export function primitiveTypeFuncImpl(input: string): boolean {
   // TODO: fill out your implementation here
   throw new Error("Function not implemented.");
 }
@@ -42,10 +31,7 @@ export function primitiveTypeFuncImpl(input: string):boolean {
  * @param input {Fruit} A set of available fruits you can consume
  * @returns {ComplexObject} A complex json object
  */
-export function referenceTypeFuncImpl(input: Fruit):ComplexObject {
+export function referenceTypeFuncImpl(input: Fruit): ComplexObject {
   // TODO: fill out your implementation here
   throw new Error("Function not implemented.");
 }
-
-
-

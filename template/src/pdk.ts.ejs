@@ -49,13 +49,33 @@ export enum <%= schema.name %> {
 <% } -%>
  */
 export function <%= imp.name %>(input:<%= imp.input ? toTypeScriptType(imp.input) : 'any' %>) <%= imp.output ? `:${toTypeScriptType(imp.output)}` : null %> {
-  const json = JSON.stringify(input);
+<% if (imp.input) { -%>
+  <% if (imp.input.contentType === 'application/json') { -%>
+  const mem = Memory.fromJsonObject(input as any)
+  <% } else if (imp.input.contentType === 'text/plain; charset=UTF-8') { -%>
+  const mem = Memory.fromString(input)
+  <% } else if (imp.input.type === 'string') { -%>
+  const mem = Memory.fromString(input)
+  <% } else if (imp.input.type === 'string') { -%>
+  <% } else { -%>
+  const mem = Memory.fromBuffer(input)
+  <% } -%>
 
-  const mem = Memory.fromString(json);
-  // TODO why?
-  // @ts-ignore
-  const ptr = hostFunctions.<%= imp.name %>(mem.offset);
+  <% if (imp.output) { -%>const ptr =<% } -%> hostFunctions.<%= imp.name %>(mem.offset)
+<% } else { -%>
+  <% if (imp.output) { -%>const ptr =<% } -%> hostFunctions.<%= imp.name %>()
+<% } -%>
 
-  return JSON.parse(Memory.find(ptr).readString());
+<% if (imp.output) { -%>
+  <% if (imp.output.contentType === 'application/json') { -%>
+    return Memory.find(ptr).readJsonObject();
+  <% } else if (imp.output.contentType === 'text/plain; charset=UTF-8') { -%>
+    return Memory.find(ptr).readString();
+  <% } else if (imp.output.type === 'string') { -%>
+    return Memory.find(ptr).readString();
+  <% } else { -%>
+    return Memory.find(ptr).readBytes();
+  <% } -%>
+<% } %>
 }
 <% }) %>

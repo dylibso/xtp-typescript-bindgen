@@ -9,7 +9,7 @@ import {
 
 <% schema.exports.forEach(ex => { -%>
 export function <%= ex.name %>(): number {
-  <% if (!propertyIsEmpty(ex.input)) { -%>
+  <% if (ex.input) { -%>
     <% if (ex.input.contentType === 'application/json') { -%>
       const input: <%= toTypeScriptType(ex.input) %> = JSON.parse(Host.inputString())
     <% } else if (ex.input.type === 'string') { -%>
@@ -18,20 +18,20 @@ export function <%= ex.name %>(): number {
       const input: ArrayBufferLike = Host.inputBytes()
     <% } -%>
 
-    <% if (!propertyIsEmpty(ex.output)) { -%>
+    <% if (ex.output) { -%>
       const output = main.<%= ex.name %>Impl(input)
     <% } else { -%>
       main.<%= ex.name %>Impl(input)
     <% } -%>
   <% } else { -%>
-    <% if (!propertyIsEmpty(ex.output)) { -%>
+    <% if (ex.output) { -%>
       const output = main.<%= ex.name %>Impl()
     <% } else { -%>
       main.<%= ex.name %>Impl()
     <% } -%>
   <% } -%>
 
-  <% if (!propertyIsEmpty(ex.output)) { -%>
+  <% if (ex.output) { -%>
     <% if (ex.output.contentType === 'application/json') { -%>
       Host.outputString(JSON.stringify(output))
     <% } else if (ex.output.type === 'string') { -%>

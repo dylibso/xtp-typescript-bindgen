@@ -11,7 +11,7 @@ import {
 export function <%= ex.name %>(): number {
   <% if (ex.input) { -%>
     <% if (ex.input.contentType === 'application/json') { -%>
-      const input: <%= toTypeScriptType(ex.input) %> = JSON.parse(Host.inputString())
+      const input: <%- toTypeScriptType(ex.input) %> = JSON.parse(Host.inputString())
     <% } else if (ex.input.type === 'string') { -%>
       const input = Host.inputString() <%= (ex.input.$ref && ex.input.$ref.enum) ? `as ${ex.input.$ref.name}` : "" %>
     <% } else { -%>

@@ -7,7 +7,7 @@ function getContext() {
   return ctx
 }
 
-function toTypeScriptType(property: Property) {
+function toTypeScriptType(property: Property): string {
   if (property.$ref) return property.$ref.name
 
   switch (property.type) {
@@ -20,8 +20,9 @@ function toTypeScriptType(property: Property) {
     case "object":
       return "any"
     case "array":
-      // TODO respect items
-      return "any[]"
+      if (!property.items) return 'Array<any>'
+      // TODO this is not quite right to force cast
+      return `Array<${toTypeScriptType(property.items as Property)}>`
     case "buffer":
       return "ArrayBufferLike"
     default:

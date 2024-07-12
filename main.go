@@ -55,6 +55,22 @@ func main() {
       "description": "This demonstrates how you can create an export with\nno inputs or outputs.\n"
     },
     {
+      "name": "arrayFunc",
+      "description": "This demonstrates how you can pass arrays in and out",
+      "input": {
+        "type": "array",
+        "items": { "$ref": "#/schemas/Fruit" },
+        "contentType": "application/json",
+        "description": "Array of fruit"
+      },
+      "output": {
+        "type": "array",
+        "items": { "type": "boolean" },
+        "contentType": "application/json",
+        "description": "An array"
+      }
+    },
+    {
       "name": "primitiveTypeFunc",
       "input": {
         "type": "string",
@@ -167,6 +183,14 @@ func main() {
         "anInt"
       ],
       "properties": [
+        {
+          "name": "array",
+          "description": "an array",
+          "type": "array",
+          "items": {
+            "$ref": "#/schemas/GhostGang"
+          }
+        },
         {
           "$ref": "#/schemas/GhostGang",
           "name": "ghost",

@@ -20,14 +20,14 @@ import {
  * <%= formatBlockComment(ex.description) %>
  *
 <% if (propertyHasComment(ex.input)) { -%>
- * @param input {<%= toTypeScriptType(ex.input) %>} <%= formatComment(ex.input.description) %>
+ * @param input {<%- toTypeScriptType(ex.input) %>} <%= formatComment(ex.input.description) %>
 <% } -%>
 <% if (propertyHasComment(ex.output)) { -%>
- * @returns {<%= toTypeScriptType(ex.output) %>} <%= formatComment(ex.output.description) %>
+ * @returns {<%- toTypeScriptType(ex.output) %>} <%= formatComment(ex.output.description) %>
 <% } -%>
  */
 <% -%>
-export function <%= ex.name %>Impl(<%= ex.input ? `input: ${toTypeScriptType(ex.input)}`: null %>)<%= ex.output ? `:${toTypeScriptType(ex.output)}` : null %> {
+export function <%= ex.name %>Impl(<%- ex.input ? `input: ${toTypeScriptType(ex.input)}`: null %>)<%- ex.output ? `:${toTypeScriptType(ex.output)}` : null %> {
   // TODO: fill out your implementation here
   throw new Error("Function not implemented.");
 }

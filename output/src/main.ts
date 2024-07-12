@@ -13,6 +13,17 @@ export function voidFuncImpl() {
 }
 
 /**
+ * This demonstrates how you can pass arrays in and out
+ *
+ * @param input {Array<Fruit>} Array of fruit
+ * @returns {Array<boolean>} An array
+ */
+export function arrayFuncImpl(input: Array<Fruit>): Array<boolean> {
+  // TODO: fill out your implementation here
+  throw new Error("Function not implemented.");
+}
+
+/**
  * This demonstrates how you can accept or return primtive types.
  * This function takes a utf8 string and returns a json encoded boolean
  *

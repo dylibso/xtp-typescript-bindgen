@@ -2,38 +2,29 @@ exports:
   - name: voidFunc
     description: |
       This demonstrates how you can create an export with
-      no inputs or outputs.
-  - name: primitiveTypeFunc
+      no inputs or outputs. 
+  - name: topLevelPrimitives
+    description: |
+      This demonstrates how you can accept or return primtive types.
+      This function takes a utf8 string and returns a json encoded array of booleans
     input:
       type: string
       contentType: text/plain; charset=UTF-8
       description: A string passed into plugin input
     output:
-      type: boolean
+      type: array
+      items:
+        type: boolean
       contentType: application/json
-      description: A boolean encoded as json
-    codeSamples:
-      - lang: typescript
-        label: |
-          Test if a string has more than one character.
-          Code samples show up in documentation and inline in docstrings
-        source: |
-          function primitiveTypeFunc(input: string): boolean {
-            return input.length > 1
-          }
+      description: A bool array encoded as json
+  - name: referenceTypes
     description: |
-      This demonstrates how you can accept or return primtive types.
-      This function takes a utf8 string and returns a json encoded boolean
-  - name: referenceTypeFunc
+      This demonstrates how parameters can be references.
+      It takes a Fruit enum and returns a ComplexObject json object
     input:
       $ref: "#/schemas/Fruit"
     output:
       $ref: "#/schemas/ComplexObject"
-    description: >
-      This demonstrates how you can accept or return references to schema types.
-
-      And it shows how you can define an enum to be used as a property or
-      input/output.
 imports:
   - name: eatAFruit
     input:
@@ -49,6 +40,7 @@ imports:
       We will support more in the future. Much of the same rules as exports
       apply.
   - name: kv_read
+    description: kvread
     input:
       type: string
       contentType: text/plain; charset=UTF-8
@@ -56,11 +48,10 @@ imports:
     output:
       type: buffer
       description: the raw byte values at key
-    description: kvread
   - name: kv_write
+    description: kvwrite
     input:
       $ref: "#/schemas/WriteParams"
-    description: kvwrite
 schemas:
   - name: WriteParams
     properties:

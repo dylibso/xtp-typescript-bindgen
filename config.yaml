@@ -2,12 +2,7 @@ template-suffix: ejs
 dependencies:
   - node
   - npm
-  
-# these could be from the xtp toml actually
-build: npm run build
-format: npm run format
-test: npm run test
 
 available-feature-flags:
-  - camelize-properties
-  - map-iso8601-dates
+#  - camelize-properties
+#  - map-iso8601-dates

@@ -4,7 +4,7 @@ declare module 'main' {
 <% }) -%>
 }
 
-<% if (schema.imports) { -%>
+<% if (schema.imports.length > 0) { -%>
 declare module 'extism:host' {
   interface user {
 <% schema.imports.forEach(im => { -%>

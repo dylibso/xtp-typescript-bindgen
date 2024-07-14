@@ -14,5 +14,3 @@ for file in ./schemas/*.yaml; do
   xtp plugin build
   cd ..
 done
-
-

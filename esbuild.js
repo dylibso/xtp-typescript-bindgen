@@ -18,7 +18,7 @@ esbuild
         name: 'stub-ejs-deps',
         setup(build) {
           build.onResolve({ filter: dummyResolves }, args => {
-            return { path: require.resolve('./dummy.js') }
+            return { path: require.resolve('./src/dummy.js') }
           });
         },
       },

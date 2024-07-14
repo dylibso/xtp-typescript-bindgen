@@ -8,16 +8,6 @@ export function voidFunc(): number {
   return 0;
 }
 
-export function arrayFunc(): number {
-  const input: Array<Fruit> = JSON.parse(Host.inputString());
-
-  const output = main.arrayFuncImpl(input);
-
-  Host.outputString(JSON.stringify(output));
-
-  return 0;
-}
-
 export function primitiveTypeFunc(): number {
   const input = Host.inputString();
 

@@ -40,11 +40,6 @@ export enum GhostGang {
  */
 export class ComplexObject {
   /**
-   * an array
-   */
-  array?: Array<GhostGang>;
-
-  /**
    * I can override the description for the property here
    */
   // @ts-expect-error TS2564

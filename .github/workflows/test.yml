@@ -1,0 +1,36 @@
+name: Run Tests
+
+on:
+  pull_request:
+    branches: [main]  # Specify the branches you want to run this on
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Extism and XTP
+        run: |
+          curl -O https://raw.githubusercontent.com/extism/js-pdk/main/install.sh
+          sh install.sh
+          curl https://static.dylibso.com/cli/install.sh | sh
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '21'
+
+      - name: Build
+        run: |
+          npm i
+          npm run build
+
+
+
+      - name: Run test script
+        run: |
+          ./test.sh
+

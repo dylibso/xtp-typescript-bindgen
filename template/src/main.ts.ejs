@@ -15,15 +15,15 @@ import {
 
 
 <% schema.exports.forEach(ex => { %>
-<% if (exportHasComment(ex)) -%>
+<% if (hasComment(ex)) -%>
 /**
- * <%= formatBlockComment(ex.description) %>
+ * <%= formatCommentBlock(ex.description) %>
  *
-<% if (propertyHasComment(ex.input)) { -%>
- * @param input {<%- toTypeScriptType(ex.input) %>} <%= formatComment(ex.input.description) %>
+<% if (hasComment(ex.input)) { -%>
+ * @param input {<%- toTypeScriptType(ex.input) %>} <%= formatCommentLine(ex.input.description) %>
 <% } -%>
-<% if (propertyHasComment(ex.output)) { -%>
- * @returns {<%- toTypeScriptType(ex.output) %>} <%= formatComment(ex.output.description) %>
+<% if (hasComment(ex.output)) { -%>
+ * @returns {<%- toTypeScriptType(ex.output) %>} <%= formatCommentLine(ex.output.description) %>
 <% } -%>
  */
 <% -%>

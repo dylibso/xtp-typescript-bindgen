@@ -6,24 +6,24 @@ const hostFunctions = Host.getFunctions()
   <% if (schema.properties) { %>
 
 /**
- * <%= formatBlockComment(schema.description) %>
+ * <%= formatCommentBlock(schema.description) %>
  */
 export class <%= schema.name %> {
   <% schema.properties.forEach(p => { %>
     <% if (p.description) { %>
 
   /**
-   * <%= formatBlockComment(p.description) %>
+   * <%= formatCommentBlock(p.description) %>
    */
   <% } -%>
   <%= p.nullable ? '' : '// @ts-expect-error TS2564\n' -%>
-  <%= p.name %><%= p.nullable ? '?' : '' %>: <%= toTypeScriptType(p) %>;
+  <%= p.name %><%= p.nullable ? '?' : '' %>: <%- toTypeScriptType(p) %>;
   <% }) %>
 }
   <% } else if (schema.enum) { %>
 
 /**
- * <%= formatComment(schema.description) %>
+ * <%= formatCommentLine(schema.description) %>
  */
 export enum <%= schema.name %> {
   <% schema.enum.forEach(variant => { -%>
@@ -37,18 +37,18 @@ export enum <%= schema.name %> {
 
 
 <% schema.imports.forEach(imp => { %>
-<% if (exportHasComment(imp)) -%>
+<% if (hasComment(imp)) -%>
 /**
- * <%= formatBlockComment(imp.description) %>
+ * <%= formatCommentBlock(imp.description) %>
  *
-<% if (propertyHasComment(imp.input)) { -%>
- * @param input {<%= toTypeScriptType(imp.input) %>} <%= formatComment(imp.input.description) %>
+<% if (hasComment(imp.input)) { -%>
+ * @param input {<%- toTypeScriptType(imp.input) %>} <%= formatCommentLine(imp.input.description) %>
 <% } -%>
-<% if (propertyHasComment(imp.output)) { -%>
- * @returns {<%= toTypeScriptType(imp.output) %>} <%= formatComment(imp.output.description) %>
+<% if (hasComment(imp.output)) { -%>
+ * @returns {<%- toTypeScriptType(imp.output) %>} <%= formatCommentLine(imp.output.description) %>
 <% } -%>
  */
-export function <%= imp.name %>(input:<%= imp.input ? toTypeScriptType(imp.input) : 'any' %>) <%= imp.output ? `:${toTypeScriptType(imp.output)}` : null %> {
+export function <%= imp.name %>(input:<%- imp.input ? toTypeScriptType(imp.input) : 'any' %>) <%- imp.output ? `:${toTypeScriptType(imp.output)}` : null %> {
 <% if (imp.input) { -%>
   <% if (imp.input.contentType === 'application/json') { -%>
   const mem = Memory.fromJsonObject(input as any)

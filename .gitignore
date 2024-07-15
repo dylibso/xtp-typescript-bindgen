@@ -1,3 +1,7 @@
 node_modules
 dist
 bundle.zip
+bundle
+tests/output
+output
+myplugin

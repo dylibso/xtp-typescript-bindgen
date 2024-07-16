@@ -31,16 +31,20 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-      - name: Build
+      - name: Install
         run: |
           npm i
-          npm run build
 
       - name: "Debug: List node_modules"
         run: ls node_modules/@dylibso/xtp-bindgen || echo "Module not found"
 
       - name: "Debug: List type definitions"
         run: ls node_modules/@dylibso/xtp-bindgen/*.d.ts || echo "Type definitions not found"
+
+      - name: Build
+        run: |
+          npm run build
+
 
       - name: Run test script
         run: |

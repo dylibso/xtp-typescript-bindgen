@@ -1,7 +1,6 @@
 node_modules
-dist
+./dist
 bundle.zip
 bundle
-tests/output
-output
+./tests/output
 myplugin

@@ -2,5 +2,5 @@ node_modules
 ./dist
 bundle.zip
 bundle
-./tests/output
+tests/output
 myplugin

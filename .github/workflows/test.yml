@@ -25,7 +25,7 @@ jobs:
 
       - name: Install
         run: |
-          npm i
+          npm ci
 
       - name: "Debug: List node_modules"
         run: ls node_modules/@dylibso/xtp-bindgen || echo "Module not found"

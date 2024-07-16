@@ -3,10 +3,18 @@ exports:
     description: |
       This demonstrates how you can create an export with
       no inputs or outputs. 
+    codeSamples:
+      - lang: typescript
+        source: |
+          console.log('Hello World!')
   - name: topLevelPrimitives
     description: |
       This demonstrates how you can accept or return primtive types.
       This function takes a utf8 string and returns a json encoded array of booleans
+    codeSamples:
+      - lang: typescript
+        source: |
+          return [true, false]
     input:
       type: string
       contentType: text/plain; charset=UTF-8
@@ -21,6 +29,10 @@ exports:
     description: |
       This demonstrates how parameters can be references.
       It takes a Fruit enum and returns a ComplexObject json object
+    codeSamples:
+      - lang: typescript
+        source: |
+          return { ghost: GhostGang.inky, aBoolean: true, aString: "okay", anInt: 123 }
     input:
       $ref: "#/schemas/Fruit"
     output:

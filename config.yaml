@@ -4,5 +4,5 @@ dependencies:
   - npm
 
 available-feature-flags:
-#  - camelize-properties
+  - stub-with-code-samples
 #  - map-iso8601-dates

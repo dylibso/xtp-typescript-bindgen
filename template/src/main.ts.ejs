@@ -29,7 +29,7 @@ import {
 <% -%>
 export function <%= ex.name %>Impl(<%- ex.input ? `input: ${toTypeScriptType(ex.input)}`: null %>)<%- ex.output ? `:${toTypeScriptType(ex.output)}` : null %> {
 <% if (featureFlags['stub-with-code-samples']) { -%>
-<%- firstCodeSample(ex, 'typescript').source %>
+<%- codeSamples(ex, 'typescript')[0].source %>
 <% } else { -%>
   // TODO: fill out your implementation here
   throw new Error("Function not implemented.");

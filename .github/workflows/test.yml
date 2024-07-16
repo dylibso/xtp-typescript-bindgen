@@ -28,10 +28,10 @@ jobs:
           npm ci
 
       - name: "Debug: List node_modules"
-        run: ls node_modules/@dylibso/xtp-bindgen || echo "Module not found"
+        run: npm ls
 
-      - name: "Debug: List type definitions"
-        run: ls node_modules/@dylibso/xtp-bindgen/dist/*.d.ts || echo "Type definitions not found"
+      - name: "Debug: List node_modules"
+        run: tree node_modules/@dylibso/xtp-bindgen
 
       - name: Build
         run: |

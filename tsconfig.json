@@ -7,7 +7,8 @@
     ], // Specify a list of library files to be included in the compilation
     "types": [
       "@extism/js-pdk",
-      "./src/index.d.ts"
+      "./src/index.d.ts",
+      "@dylibso/xtp-bindgen"
     ], // Specify a list of type definition files to be included in the compilation
     "strict": true, // Enable all strict type-checking options
     "esModuleInterop": true, // Enables compatibility with Babel-style module imports

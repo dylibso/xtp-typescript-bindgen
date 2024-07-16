@@ -36,6 +36,12 @@ jobs:
           npm i
           npm run build
 
+      - name: "Debug: List node_modules"
+        run: ls node_modules/@dylibso/xtp-bindgen || echo "Module not found"
+
+      - name: "Debug: List type definitions"
+        run: ls node_modules/@dylibso/xtp-bindgen/*.d.ts || echo "Type definitions not found"
+
       - name: Run test script
         run: |
           cd tests && ./test.sh

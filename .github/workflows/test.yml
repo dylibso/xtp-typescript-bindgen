@@ -40,7 +40,8 @@ jobs:
           curl -L https://github.com/dylibso/xtp-bindgen-test/releases/download/0.0.2/bundle.zip > bundle.zip
           unzip bundle.zip
           cd bundle/
-          xtp plugin init --schema-file schema.yaml --language TypeScript --path exampleplugin --feature stub-with-code-samples
+          // ../tests/bundle is the template we built in the previous step, too many bundles
+          xtp plugin init --schema-file schema.yaml --template ../tests/bundle --path exampleplugin --feature stub-with-code-samples
           cd exampleplugin/ && npm run build && cd ..
           xtp plugin test exampleplugin/dist/plugin.wasm --with test.wasm --mock-host mock.wasm
 

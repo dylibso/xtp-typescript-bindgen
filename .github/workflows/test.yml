@@ -35,3 +35,19 @@ jobs:
         run: |
           cd tests && ./test.sh
 
+      - name: Run Bindgen Test
+        run: |
+          # we already have a folder named bundle
+          # move it before we get the simulation bundle
+          # TODO change the name
+          mv bundle template-bundle
+
+          curl -L https://github.com/dylibso/xtp-bindgen-test/releases/download/0.0.2/bundle.zip > bundle.zip
+          unzip bundle.zip
+          cd bundle/
+
+          # Using ../template-bundle so we test the head template
+          xtp plugin init --schema-file schema.yaml --template ../template-bundle --path exampleplugin --feature stub-with-code-samples
+          cd exampleplugin/ && npm run build && cd ..
+          xtp plugin test exampleplugin/dist/plugin.wasm --with test.wasm --mock-host mock.wasm
+

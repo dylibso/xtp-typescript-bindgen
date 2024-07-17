@@ -8,6 +8,9 @@ function toTypeScriptType(property: Property): string {
     case "string":
       return "string"
     case "integer":
+      if (property.format === 'int64') throw Error(`We do not support format int64 yet`)
+      return "number"
+    case "number":
       return "number"
     case "boolean":
       return "boolean"

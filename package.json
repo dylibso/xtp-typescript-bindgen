@@ -1,6 +1,6 @@
 {
   "name": "xtp-typescript-bindgen",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "XTP TypeScript bindgen plugin",
   "main": "dist/index.js",
   "scripts": {

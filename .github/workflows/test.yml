@@ -42,7 +42,16 @@ jobs:
           # TODO change the name
           mv bundle template-bundle
 
-          curl -L https://github.com/dylibso/xtp-bindgen-test/releases/download/0.0.3/bundle.zip > bundle.zip
+          # get the latest release
+          RELEASE_INFO=$(curl -s "https://api.github.com/repos/dylibso/xtp-bindgen-test/releases/latest")
+          ASSET_URL=$(echo $RELEASE_INFO | grep -oP '"browser_download_url": "\K(.*bundle.zip)(?=")')
+          if [ -z "$ASSET_URL" ]; then
+            echo "Asset URL not found. Please check the asset name or the repository."
+            exit 1
+          fi
+
+          # download and unzip the bundle
+          curl -L -o bundle.zip "$ASSET_URL"
           unzip bundle.zip
           cd bundle/
 

@@ -42,7 +42,7 @@ jobs:
           # TODO change the name
           mv bundle template-bundle
 
-          curl -L https://github.com/dylibso/xtp-bindgen-test/releases/download/0.0.2/bundle.zip > bundle.zip
+          curl -L https://github.com/dylibso/xtp-bindgen-test/releases/download/0.0.3/bundle.zip > bundle.zip
           unzip bundle.zip
           cd bundle/
 

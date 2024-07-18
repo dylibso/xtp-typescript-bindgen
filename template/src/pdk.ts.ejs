@@ -16,7 +16,7 @@ export class <%= schema.name %> {
    * <%= formatCommentBlock(p.description) %>
    */
   <% } -%>
-  <%= p.nullable ? '' : '// @ts-expect-error TS2564\n' -%>
+  <%= (p.nullable || toTypeScriptType(p) === 'any') ? '' : '// @ts-expect-error TS2564\n' -%>
   <%= p.name %><%= p.nullable ? '?' : '' %>: <%- toTypeScriptType(p) %>;
   <% }) %>
 }

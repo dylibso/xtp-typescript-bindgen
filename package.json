@@ -1,7 +1,7 @@
 {
   "name": "xtp-typescript-bindgen",
   "version": "0.0.11",
-  "description": "XTP TypeScript bindgen plugin",
+  "description": "XTP TypeScript bindgen plugin hello",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc --noEmit && node esbuild.js && extism-js dist/index.js -i src/index.d.ts -o dist/plugin.wasm"

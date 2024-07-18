@@ -47,7 +47,7 @@ jobs:
           cd bundle/
 
           # Using ../template-bundle so we test the head template
-          xtp plugin init --schema-file schema.yaml --template ../template-bundle --path exampleplugin --feature stub-with-code-samples
+          xtp plugin init --schema-file schema.yaml --template ../template-bundle --path exampleplugin --name exampleplugin --feature stub-with-code-samples
           cd exampleplugin/ && npm run build && cd ..
           xtp plugin test exampleplugin/dist/plugin.wasm --with test.wasm --mock-host mock.wasm
 

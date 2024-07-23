@@ -61,6 +61,11 @@ function toTypeScriptType(property: Property): string {
   return `${tp} | null`
 }
 
+function isDateTime(p: Property | null): boolean {
+  if (!p) return false
+  return p.type === 'string' && p.format === 'date-time'
+}
+
 function isJsonEncoded(p: Property | null): boolean {
   if (!p) return false
   return p.contentType === 'application/json'
@@ -86,6 +91,7 @@ export function render() {
     isJsonEncoded,
     isUtf8Encoded,
     isPrimitive,
+    isDateTime,
   }
   const output = ejs.render(tmpl, ctx)
   Host.outputString(output)

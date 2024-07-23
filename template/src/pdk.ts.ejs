@@ -25,9 +25,9 @@ export class <%= schema.name %> {
       ...obj,
       <% schema.properties.forEach(p => { -%>
         <% if (needsCasting(p)) { -%>
-          <% if (p.type === "string" && p.format === "date-time") { -%>
+          <% if (isDateTime(p)) { -%>
             <%= p.name -%>: obj.<%= p.name -%> ? new Date(obj.<%= p.name -%>) : null,
-          <% } else if (p.$ref && !p.$ref.enum) {-%>
+          <% } else if (!isPrimitive(p)) {-%>
             <%= p.name -%>: obj.<%= p.name -%> ? <%= p.$ref.name %>.fromJson(obj.<%= p.name %>) : null,
           <% } -%>
         <% } -%>

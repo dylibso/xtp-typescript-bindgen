@@ -14,8 +14,8 @@ export function <%= ex.name %>(): number {
       <% if (isPrimitive(ex.input)) { -%>
         const input: <%- toTypeScriptType(ex.input) %> = JSON.parse(Host.inputString())
       <% } else { -%>
-        const untyped = JSON.parse(Host.inputString())
-        const input = <%= toTypeScriptType(ex.input) %>.fromJson(untyped)
+        const untypedInput = JSON.parse(Host.inputString())
+        const input = <%= toTypeScriptType(ex.input) %>.fromJson(untypedInput)
       <% } -%>
     <% } else if (ex.input.type === 'string') { -%>
       const input = Host.inputString() <%= (ex.input.$ref && ex.input.$ref.enum) ? `as ${ex.input.$ref.name}` : "" %>
@@ -41,8 +41,8 @@ export function <%= ex.name %>(): number {
       <% if (isPrimitive(ex.output)) { -%>
         Host.outputString(JSON.stringify(output))
       <% } else { -%>
-        const untyped = <%= toTypeScriptType(ex.output) %>.toJson(output)
-        Host.outputString(JSON.stringify(untyped))
+        const untypedOutput = <%= toTypeScriptType(ex.output) %>.toJson(output)
+        Host.outputString(JSON.stringify(untypedOutput))
       <% } -%>
     <% } else if (ex.output.type === 'string') { -%>
       Host.outputString(output)

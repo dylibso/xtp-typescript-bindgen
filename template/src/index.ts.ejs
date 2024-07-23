@@ -10,8 +10,13 @@ import {
 <% schema.exports.forEach(ex => { -%>
 export function <%= ex.name %>(): number {
   <% if (ex.input) { -%>
-    <% if (ex.input.contentType === 'application/json') { -%>
-      const input: <%- toTypeScriptType(ex.input) %> = JSON.parse(Host.inputString())
+    <% if (isJsonEncoded(ex.input)) { -%>
+      <% if (isPrimitive(ex.input)) { -%>
+        const input: <%- toTypeScriptType(ex.input) %> = JSON.parse(Host.inputString())
+      <% } else { -%>
+        const untyped = JSON.parse(Host.inputString())
+        const input = <%= toTypeScriptType(ex.input) %>.fromJson(untyped)
+      <% } -%>
     <% } else if (ex.input.type === 'string') { -%>
       const input = Host.inputString() <%= (ex.input.$ref && ex.input.$ref.enum) ? `as ${ex.input.$ref.name}` : "" %>
     <% } else { -%>
@@ -32,8 +37,13 @@ export function <%= ex.name %>(): number {
   <% } -%>
 
   <% if (ex.output) { -%>
-    <% if (ex.output.contentType === 'application/json') { -%>
-      Host.outputString(JSON.stringify(output))
+    <% if (isJsonEncoded(ex.output)) { -%>
+      <% if (isPrimitive(ex.output)) { -%>
+        Host.outputString(JSON.stringify(output))
+      <% } else { -%>
+        const untyped = <%= toTypeScriptType(ex.output) %>.toJson(output)
+        Host.outputString(JSON.stringify(untyped))
+      <% } -%>
     <% } else if (ex.output.type === 'string') { -%>
       Host.outputString(output)
     <% } else { -%>

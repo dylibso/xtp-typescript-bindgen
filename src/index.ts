@@ -1,30 +1,80 @@
 import ejs from 'ejs'
 import { helpers, getContext, Property } from "@dylibso/xtp-bindgen"
 
-function toTypeScriptType(property: Property): string {
-  if (property.$ref) return property.$ref.name
+function needsCasting(property: Property): boolean {
+  if (property.$ref) return true
 
   switch (property.type) {
     case "string":
-      return "string"
-    case "integer":
-      if (property.format === 'int64') throw Error(`We do not support format int64 yet`)
-      return "number"
-    case "number":
-      return "number"
-    case "boolean":
-      return "boolean"
-    case "object":
-      return "any"
-    case "array":
-      if (!property.items) return 'Array<any>'
-      // TODO this is not quite right to force cast
-      return `Array<${toTypeScriptType(property.items as Property)}>`
-    case "buffer":
-      return "ArrayBufferLike"
+      if (property.format === 'date-time') return true
+      return false
     default:
-      throw new Error("Cant convert property to typescript type: " + property.type)
+      return false
   }
+}
+
+function toTypeScriptType(property: Property): string {
+  let tp
+  if (property.$ref) {
+    tp = property.$ref.name
+  } else {
+    switch (property.type) {
+      case "string":
+        if (property.format === 'date-time') {
+          tp = 'Date'
+        } else {
+          tp = "string"
+        }
+        break
+      case "integer":
+        if (property.format === 'int64') {
+          throw Error(`We do not support format int64 yet`)
+        } else {
+          tp = "number"
+        }
+        break
+      case "number":
+        tp = "number"
+        break
+      case "boolean":
+        tp = "boolean"
+        break
+      case "object":
+        tp = "any"
+        break
+      case "array":
+        if (!property.items) {
+          tp = 'Array<any>'
+        } else {
+          // TODO this is not quite right to force cast
+          tp = `Array<${toTypeScriptType(property.items as Property)}>`
+        }
+        break
+      case "buffer":
+        tp = "ArrayBufferLike"
+        break
+    }
+  }
+
+  if (!tp) throw new Error("Cant convert property to typescript type: " + property.type)
+  if (!property.nullable) return tp
+  return `${tp} | null`
+}
+
+function isJsonEncoded(p: Property | null): boolean {
+  if (!p) return false
+  return p.contentType === 'application/json'
+}
+
+function isUtf8Encoded(p: Property | null): boolean {
+  if (!p) return false
+  return p.contentType === 'text/plain; charset=UTF-8'
+}
+
+function isPrimitive(p: Property): boolean {
+  if (!p.$ref) return true
+  if (p.$ref.enum) return true
+  return !p.$ref.properties
 }
 
 export function render() {
@@ -33,6 +83,10 @@ export function render() {
     ...getContext(),
     ...helpers,
     toTypeScriptType,
+    needsCasting,
+    isJsonEncoded,
+    isUtf8Encoded,
+    isPrimitive,
   }
   const output = ejs.render(tmpl, ctx)
   Host.outputString(output)

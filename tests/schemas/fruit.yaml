@@ -115,6 +115,8 @@ schemas:
         description: |
           A datetime object, we will automatically serialize and deserialize
           this for you.
+      - name: writeParams
+        $ref: "#/schemas/WriteParams"
     contentType: application/json
     description: A complex json object
 version: v1-draft

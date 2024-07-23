@@ -61,26 +61,6 @@ function toTypeScriptType(property: Property): string {
   return `${tp} | null`
 }
 
-function isDateTime(p: Property | null): boolean {
-  if (!p) return false
-  return p.type === 'string' && p.format === 'date-time'
-}
-
-function isJsonEncoded(p: Property | null): boolean {
-  if (!p) return false
-  return p.contentType === 'application/json'
-}
-
-function isUtf8Encoded(p: Property | null): boolean {
-  if (!p) return false
-  return p.contentType === 'text/plain; charset=UTF-8'
-}
-
-function isPrimitive(p: Property): boolean {
-  if (!p.$ref) return true
-  return !!p.$ref.enum && !p.$ref.properties
-}
-
 export function render() {
   const tmpl = Host.inputString()
   const ctx = {
@@ -88,10 +68,6 @@ export function render() {
     ...helpers,
     toTypeScriptType,
     needsCasting,
-    isJsonEncoded,
-    isUtf8Encoded,
-    isPrimitive,
-    isDateTime,
   }
   const output = ejs.render(tmpl, ctx)
   Host.outputString(output)

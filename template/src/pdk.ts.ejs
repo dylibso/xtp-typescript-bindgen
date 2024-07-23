@@ -28,7 +28,7 @@ export class <%= schema.name %> {
           <% if (p.type === "string" && p.format === "date-time") { -%>
             <%= p.name -%>: obj.<%= p.name -%> ? new Date(obj.<%= p.name -%>) : null,
           <% } else if (p.$ref && !p.$ref.enum) {-%>
-            <%= p.name -%>: obj.<%= p.name -%> ? <%= schema.name %>.fromJson(obj.<%= p.name %>) : null,
+            <%= p.name -%>: obj.<%= p.name -%> ? <%= p.$ref.name %>.fromJson(obj.<%= p.name %>) : null,
           <% } -%>
         <% } -%>
       <% }) -%>

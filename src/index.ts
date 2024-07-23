@@ -73,8 +73,7 @@ function isUtf8Encoded(p: Property | null): boolean {
 
 function isPrimitive(p: Property): boolean {
   if (!p.$ref) return true
-  if (p.$ref.enum) return true
-  return !p.$ref.properties
+  return !!p.$ref.enum && !p.$ref.properties
 }
 
 export function render() {

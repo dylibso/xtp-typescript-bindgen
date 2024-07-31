@@ -4,8 +4,7 @@
 > be made without warning. Please wait before you start writing new bindgens.
 
 This repository houses the prototype for bingden for typescript plug-ins in XTP.
-It's based on the
-[XTP Schema](https://docs.xtp.dylibso.com/docs/concepts/xtp-schema) as the
+It's based on the [XTP Schema](https://docs.xtp.dylibso.com/docs/concepts/xtp-schema) as the
 driving document. This document will be used to generate code and documentation
 for plug-in systems and is specifically tailored to
 [Extism](https://extism.org/) at the moment.

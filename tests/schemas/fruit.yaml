@@ -1,23 +1,22 @@
 exports:
-  - name: voidFunc
-    description: |
-      This demonstrates how you can create an export with
-      no inputs or outputs. 
+  voidFunc:
+    description: "This demonstrates how you can create an export with\nno inputs or
+      outputs. \n"
     codeSamples:
-      - lang: typescript
-        source: |
-          console.log('Hello World!')
-  - name: topLevelPrimitives
+    - lang: typescript
+      source: |
+        console.log(''Hello World!'')
+  topLevelPrimitives:
     description: |
       This demonstrates how you can accept or return primtive types.
       This function takes a utf8 string and returns a json encoded array of booleans
     codeSamples:
-      - lang: typescript
-        source: |
-          return [true, false]
+    - lang: typescript
+      source: |
+        return [true, false]
     input:
       type: string
-      contentType: text/plain; charset=UTF-8
+      contentType: text/plain; charset=utf-8
       description: A string passed into plugin input
     output:
       type: array
@@ -25,98 +24,93 @@ exports:
         type: boolean
       contentType: application/json
       description: A bool array encoded as json
-  - name: referenceTypes
+  referenceTypes:
     description: |
       This demonstrates how parameters can be references.
       It takes a Fruit enum and returns a ComplexObject json object
     codeSamples:
-      - lang: typescript
-        source: |
-          return { ghost: GhostGang.inky, aBoolean: true, aString: "okay", anInt: 123 }
+    - lang: typescript
+      source: |
+        return { ghost: GhostGang.inky, aBoolean: true, aString: "okay", anInt: 123 }
     input:
-      $ref: "#/schemas/Fruit"
+      $ref: "#/components/schemas/Fruit"
     output:
-      $ref: "#/schemas/ComplexObject"
+      $ref: "#/components/schemas/ComplexObject"
 imports:
-  - name: eatAFruit
+  eatAFruit:
     input:
-      $ref: "#/schemas/Fruit"
+      "$ref": "#/components/schemas/Fruit"
     output:
       type: boolean
       contentType: application/json
       description: boolean encoded as json
-    description: >
-      This is a host function. Right now host functions can only be the type
-      (i64) -> i64.
-
-      We will support more in the future. Much of the same rules as exports
-      apply.
-  - name: kv_read
+    description: |
+      This is a host function. Right now host functions can only be the type (i64) -> i64.
+      We will support more in the future. Much of the same rules as exports apply.
+  kv_read:
     description: kvread
     input:
       type: string
-      contentType: text/plain; charset=UTF-8
+      contentType: text/plain; charset=utf-8
       description: the key
     output:
       type: buffer
       description: the raw byte values at key
-  - name: kv_write
+  kv_write:
     description: kvwrite
     input:
-      $ref: "#/schemas/WriteParams"
-schemas:
-  - name: WriteParams
-    properties:
-      - name: key
-        type: string
-        description: key
-      - name: value
-        type: buffer
-        description: value
-    contentType: application/json
-    description: Parameters to write to kv store
-  - enum:
+      "$ref": "#/components/schemas/WriteParams"
+version: v1-draft
+components:
+  schemas:
+    WriteParams:
+      properties:
+        key:
+          type: string
+          description: key
+        value:
+          type: buffer
+          description: value
+      contentType: application/json
+      description: Parameters to write to kv store
+    Fruit:
+      enum:
       - apple
       - orange
       - banana
       - strawberry
-    name: Fruit
-    description: A set of available fruits you can consume
-  - enum:
+      description: A set of available fruits you can consume
+    GhostGang:
+      enum:
       - blinky
       - pinky
       - inky
       - clyde
-    name: GhostGang
-    description: A set of all the enemies of pac-man
-  - name: ComplexObject
-    required:
-      - ghost
-      - aBoolean
-      - aString
-      - anInt
-    properties:
-      - $ref: "#/schemas/GhostGang"
-        name: ghost
-        description: I can override the description for the property here
-      - name: aBoolean
-        type: boolean
-        description: A boolean prop
-      - name: aString
-        type: string
-        description: An string prop
-      - name: anInt
-        type: integer
-        format: int32
-        description: An int prop
-      - name: anOptionalDate
-        type: string
-        format: date-time
-        description: |
-          A datetime object, we will automatically serialize and deserialize
-          this for you.
-      - name: writeParams
-        $ref: "#/schemas/WriteParams"
-    contentType: application/json
-    description: A complex json object
-version: v1-draft
+      description: A set of all the enemies of pac-man
+    ComplexObject:
+      properties:
+        ghost:
+          "$ref": "#/components/schemas/GhostGang"
+          description: I can override the description for the property here
+        aBoolean:
+          type: boolean
+          description: A boolean prop
+        aString:
+          type: string
+          description: An string prop
+        anInt:
+          type: integer
+          format: int32
+          description: An int prop
+        anOptionalDate:
+          type: string
+          format: date-time
+          description: |
+            A datetime object, we will automatically serialize and deserialize
+            this for you.
+          nullable: true
+        writeParams:
+          "$ref": "#/components/schemas/WriteParams"
+          nullable: true
+      contentType: application/json
+      description: A complex json object

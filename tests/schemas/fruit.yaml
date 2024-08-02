@@ -33,17 +33,20 @@ exports:
       source: |
         return { ghost: GhostGang.inky, aBoolean: true, aString: "okay", anInt: 123 }
     input:
+      contentType: application/json
       $ref: "#/components/schemas/Fruit"
     output:
+      contentType: application/json
       $ref: "#/components/schemas/ComplexObject"
 imports:
   eatAFruit:
     input:
+      contentType: text/plain; charset=utf-8
       "$ref": "#/components/schemas/Fruit"
     output:
       type: boolean
-      contentType: application/json
       description: boolean encoded as json
+      contentType: application/json
     description: |
       This is a host function. Right now host functions can only be the type (i64) -> i64.
       We will support more in the future. Much of the same rules as exports apply.
@@ -54,11 +57,14 @@ imports:
       contentType: text/plain; charset=utf-8
       description: the key
     output:
+      contentType: application/x-binary
       type: buffer
       description: the raw byte values at key
   kv_write:
     description: kvwrite
+    contentType: application/json
     input:
+      contentType: application/json
       "$ref": "#/components/schemas/WriteParams"
 version: v1-draft
 components:
@@ -71,7 +77,6 @@ components:
         value:
           type: buffer
           description: value
-      contentType: application/json
       description: Parameters to write to kv store
     Fruit:
       enum:
@@ -112,5 +117,4 @@ components:
         writeParams:
           "$ref": "#/components/schemas/WriteParams"
           nullable: true
-      contentType: application/json
       description: A complex json object

@@ -3,7 +3,7 @@ const hostFunctions = Host.getFunctions()
 <% } %>
 
 <% Object.values(schema.schemas).forEach(schema => { %>
-  <% if (schema.properties) { %>
+  <% if (schema.properties.length > 0) { %>
 
 /**
  * <%= formatCommentBlock(schema.description) %>

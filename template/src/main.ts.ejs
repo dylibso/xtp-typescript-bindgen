@@ -28,7 +28,7 @@ import {
  */
 <% -%>
 export function <%= ex.name %>Impl(<%- ex.input ? `input: ${toTypeScriptType(ex.input)}`: null %>)<%- ex.output ? `:${toTypeScriptType(ex.output)}` : null %> {
-<% if (featureFlags['stub-with-code-samples']) { -%>
+<% if (featureFlags['stub-with-code-samples'] && codeSamples(ex, 'typescript').length > 0) { -%>
 <%- codeSamples(ex, 'typescript')[0].source %>
 <% } else { -%>
   // TODO: fill out your implementation here

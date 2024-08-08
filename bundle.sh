@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-npm run build
+npm i && npm run build
 
 rm -rf bundle
 mkdir bundle

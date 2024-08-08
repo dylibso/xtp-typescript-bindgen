@@ -3,7 +3,7 @@ const hostFunctions = Host.getFunctions()
 <% } %>
 
 <% Object.values(schema.schemas).forEach(schema => { %>
-  <% if (schema.properties) { %>
+  <% if (schema.properties.length > 0) { %>
 
 /**
  * <%= formatCommentBlock(schema.description) %>
@@ -87,10 +87,9 @@ export function <%= imp.name %>(input:<%- imp.input ? toTypeScriptType(imp.input
       const mem = Memory.fromJsonObject(casted)
     <% } %>
   <% } else if (isUtf8Encoded(imp.input)) { -%>
-  const mem = Memory.fromString(input)
+  const mem = Memory.fromString(input as string)
   <% } else if (imp.input.type === 'string') { -%>
   const mem = Memory.fromString(input)
-  <% } else if (imp.input.type === 'string') { -%>
   <% } else { -%>
   const mem = Memory.fromBuffer(input)
   <% } -%>

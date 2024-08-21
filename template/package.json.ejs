@@ -1,7 +1,7 @@
 {
-  "name": "<%= project.name %>",
+  "name": "<%- project.name %>",
   "version": "1.0.0",
-  "description": "<%= project.description %>",
+  "description": "<%- project.description %>",
   "main": "src/index.ts",
   "scripts": {
     "build": "npx tsc --noEmit && node esbuild.js && extism-js dist/index.js -i src/index.d.ts -o dist/plugin.wasm",

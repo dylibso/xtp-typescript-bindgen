@@ -1,11 +1,11 @@
-app_id = "<%= project.appId %>"
+app_id = "<%- project.appId %>"
 
 # This is where 'xtp plugin push' expects to find the wasm file after the build script has run.
 bin = "dist/plugin.wasm"
-extension_point_id = "<%= project.extensionPointId %>"
+extension_point_id = "<%- project.extensionPointId %>"
 
 # This is the 'binding' name used for the plugin.
-name = "<%= project.name %>"
+name = "<%- project.name %>"
 
 [scripts]
 # xtp plugin build runs this script to generate the wasm file

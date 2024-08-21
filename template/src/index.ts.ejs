@@ -2,37 +2,37 @@ import * as main from "./main"
 <% if (Object.values(schema.schemas).length > 0) { %>
 import {
   <% Object.values(schema.schemas).forEach(schema => { -%>
-    <%= schema.name %>,
+    <%- schema.name %>,
   <% }) -%>
 } from './pdk'
 <% } %>
 
 <% schema.exports.forEach(ex => { -%>
-export function <%= ex.name %>(): number {
+export function <%- ex.name %>(): number {
   <% if (ex.input) { -%>
     <% if (isJsonEncoded(ex.input)) { -%>
       <% if (isPrimitive(ex.input)) { -%>
         const input: <%- toTypeScriptType(ex.input) %> = JSON.parse(Host.inputString())
       <% } else { -%>
         const untypedInput = JSON.parse(Host.inputString())
-        const input = <%= toTypeScriptType(ex.input) %>.fromJson(untypedInput)
+        const input = <%- toTypeScriptType(ex.input) %>.fromJson(untypedInput)
       <% } -%>
     <% } else if (ex.input.type === 'string') { -%>
-      const input = Host.inputString() <%= (ex.input.$ref && ex.input.$ref.enum) ? `as ${ex.input.$ref.name}` : "" %>
+      const input = Host.inputString() <%- (ex.input.$ref && ex.input.$ref.enum) ? `as ${ex.input.$ref.name}` : "" %>
     <% } else { -%>
       const input: ArrayBufferLike = Host.inputBytes()
     <% } -%>
 
     <% if (ex.output) { -%>
-      const output = main.<%= ex.name %>Impl(input)
+      const output = main.<%- ex.name %>Impl(input)
     <% } else { -%>
-      main.<%= ex.name %>Impl(input)
+      main.<%- ex.name %>Impl(input)
     <% } -%>
   <% } else { -%>
     <% if (ex.output) { -%>
-      const output = main.<%= ex.name %>Impl()
+      const output = main.<%- ex.name %>Impl()
     <% } else { -%>
-      main.<%= ex.name %>Impl()
+      main.<%- ex.name %>Impl()
     <% } -%>
   <% } -%>
 
@@ -41,7 +41,7 @@ export function <%= ex.name %>(): number {
       <% if (isPrimitive(ex.output)) { -%>
         Host.outputString(JSON.stringify(output))
       <% } else { -%>
-        const untypedOutput = <%= toTypeScriptType(ex.output) %>.toJson(output)
+        const untypedOutput = <%- toTypeScriptType(ex.output) %>.toJson(output)
         Host.outputString(JSON.stringify(untypedOutput))
       <% } -%>
     <% } else if (ex.output.type === 'string') { -%>

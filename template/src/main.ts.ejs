@@ -1,14 +1,14 @@
 <% if (Object.values(schema.schemas).length > 0) { %>
 import {
   <% Object.values(schema.schemas).forEach(schema => { -%>
-    <%= schema.name %>,
+    <%- schema.name %>,
   <% }) -%>
 } from './pdk'
 <% } %>
 <% if (schema.imports.length > 0) { %>
 import {
   <% schema.imports.forEach(imp => { -%>
-    <%= imp.name %>,
+    <%- imp.name %>,
   <% }) -%>
 } from './pdk'
 <% } %>
@@ -17,17 +17,17 @@ import {
 <% schema.exports.forEach(ex => { %>
 <% if (hasComment(ex)) -%>
 /**
- * <%= formatCommentBlock(ex.description) %>
+ * <%- formatCommentBlock(ex.description) %>
  *
 <% if (hasComment(ex.input)) { -%>
- * @param input {<%- toTypeScriptType(ex.input) %>} <%= formatCommentLine(ex.input.description) %>
+ * @param input {<%- toTypeScriptType(ex.input) %>} <%- formatCommentLine(ex.input.description) %>
 <% } -%>
 <% if (hasComment(ex.output)) { -%>
- * @returns {<%- toTypeScriptType(ex.output) %>} <%= formatCommentLine(ex.output.description) %>
+ * @returns {<%- toTypeScriptType(ex.output) %>} <%- formatCommentLine(ex.output.description) %>
 <% } -%>
  */
 <% -%>
-export function <%= ex.name %>Impl(<%- ex.input ? `input: ${toTypeScriptType(ex.input)}`: null %>)<%- ex.output ? `:${toTypeScriptType(ex.output)}` : null %> {
+export function <%- ex.name %>Impl(<%- ex.input ? `input: ${toTypeScriptType(ex.input)}`: null %>)<%- ex.output ? `:${toTypeScriptType(ex.output)}` : null %> {
 <% if (featureFlags['stub-with-code-samples'] && codeSamples(ex, 'typescript').length > 0) { -%>
 <%- codeSamples(ex, 'typescript')[0].source %>
 <% } else { -%>

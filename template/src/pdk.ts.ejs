@@ -6,44 +6,44 @@ const hostFunctions = Host.getFunctions()
   <% if (schema.properties.length > 0) { %>
 
 /**
- * <%= formatCommentBlock(schema.description) %>
+ * <%- formatCommentBlock(schema.description) %>
  */
-export class <%= schema.name %> {
+export class <%- schema.name %> {
   <% schema.properties.forEach(p => { %>
   <% if (p.description) { %>
 
   /**
-   * <%= formatCommentBlock(p.description) %>
+   * <%- formatCommentBlock(p.description) %>
    */
   <% } -%>
-  <%= (p.nullable || toTypeScriptType(p) === 'any') ? null : '// @ts-expect-error TS2564\n' -%>
-  <%= p.name %><%= p.nullable ? '?' : null %>: <%- toTypeScriptType(p) %>;
+  <%- (p.nullable || toTypeScriptType(p) === 'any') ? null : '// @ts-expect-error TS2564\n' -%>
+  <%- p.name %><%- p.nullable ? '?' : null %>: <%- toTypeScriptType(p) %>;
   <% }) %>
 
-  static fromJson(obj: any): <%= schema.name %> {
+  static fromJson(obj: any): <%- schema.name %> {
     return {
       ...obj,
       <% schema.properties.forEach(p => { -%>
         <% if (needsCasting(p)) { -%>
           <% if (isDateTime(p)) { -%>
-            <%= p.name -%>: obj.<%= p.name -%> ? new Date(obj.<%= p.name -%>) : null,
+            <%- p.name -%>: obj.<%- p.name -%> ? new Date(obj.<%- p.name -%>) : null,
           <% } else if (!isPrimitive(p)) {-%>
-            <%= p.name -%>: obj.<%= p.name -%> ? <%= p.$ref.name %>.fromJson(obj.<%= p.name %>) : null,
+            <%- p.name -%>: obj.<%- p.name -%> ? <%- p.$ref.name %>.fromJson(obj.<%- p.name %>) : null,
           <% } -%>
         <% } -%>
       <% }) -%>
     }
   }
 
-  static toJson(obj: <%= schema.name %>): any{
+  static toJson(obj: <%- schema.name %>): any{
     return {
       ...obj,
       <% schema.properties.forEach(p => { -%>
         <% if (needsCasting(p)) { -%>
           <% if (p.type === "string" && p.format === "date-time") { -%>
-            <%= p.name -%>: obj.<%= p.name -%> ? obj.<%= p.name %>.toISOString() : null,
+            <%- p.name -%>: obj.<%- p.name -%> ? obj.<%- p.name %>.toISOString() : null,
           <% } else if (p.$ref && !p.$ref.enum) {-%>
-            <%= p.name -%>: obj.<%= p.name -%> ? <%= p.$ref.name %>.toJson(obj.<%= p.name %>) : null,
+            <%- p.name -%>: obj.<%- p.name -%> ? <%- p.$ref.name %>.toJson(obj.<%- p.name %>) : null,
           <% } -%>
         <% } -%>
       <% }) -%>
@@ -53,11 +53,11 @@ export class <%= schema.name %> {
   <% } else if (schema.enum) { %>
 
 /**
- * <%= formatCommentLine(schema.description) %>
+ * <%- formatCommentLine(schema.description) %>
  */
-export enum <%= schema.name %> {
+export enum <%- schema.name %> {
   <% schema.enum.forEach(variant => { -%>
-    <%= variant %> = "<%= variant %>",
+    <%- variant %> = "<%- variant %>",
   <% }) -%>
 }
 
@@ -68,22 +68,22 @@ export enum <%= schema.name %> {
 <% schema.imports.forEach(imp => { %>
 <% if (hasComment(imp)) -%>
 /**
- * <%= formatCommentBlock(imp.description) %>
+ * <%- formatCommentBlock(imp.description) %>
  *
 <% if (hasComment(imp.input)) { -%>
- * @param input {<%- toTypeScriptType(imp.input) %>} <%= formatCommentLine(imp.input.description) %>
+ * @param input {<%- toTypeScriptType(imp.input) %>} <%- formatCommentLine(imp.input.description) %>
 <% } -%>
 <% if (hasComment(imp.output)) { -%>
- * @returns {<%- toTypeScriptType(imp.output) %>} <%= formatCommentLine(imp.output.description) %>
+ * @returns {<%- toTypeScriptType(imp.output) %>} <%- formatCommentLine(imp.output.description) %>
 <% } -%>
  */
-export function <%= imp.name %>(input:<%- imp.input ? toTypeScriptType(imp.input) : 'any' %>) <%- imp.output ? `:${toTypeScriptType(imp.output)}` : null %> {
+export function <%- imp.name %>(input:<%- imp.input ? toTypeScriptType(imp.input) : 'any' %>) <%- imp.output ? `:${toTypeScriptType(imp.output)}` : null %> {
 <% if (imp.input) { -%>
   <% if (isJsonEncoded(imp.input)) { -%>
     <% if (isPrimitive(imp.input)) { %>
       const mem = Memory.fromJsonObject(input as any)
     <% } else { %>
-      const casted = <%= toTypeScriptType(imp.input) %>.toJson(input)
+      const casted = <%- toTypeScriptType(imp.input) %>.toJson(input)
       const mem = Memory.fromJsonObject(casted)
     <% } %>
   <% } else if (isUtf8Encoded(imp.input)) { -%>
@@ -94,9 +94,9 @@ export function <%= imp.name %>(input:<%- imp.input ? toTypeScriptType(imp.input
   const mem = Memory.fromBuffer(input)
   <% } -%>
 
-  <% if (imp.output) { -%>const ptr =<% } -%> hostFunctions.<%= imp.name %>(mem.offset)
+  <% if (imp.output) { -%>const ptr =<% } -%> hostFunctions.<%- imp.name %>(mem.offset)
 <% } else { -%>
-  <% if (imp.output) { -%>const ptr =<% } -%> hostFunctions.<%= imp.name %>()
+  <% if (imp.output) { -%>const ptr =<% } -%> hostFunctions.<%- imp.name %>()
 <% } -%>
 
 <% if (imp.output) { -%>
@@ -105,7 +105,7 @@ export function <%= imp.name %>(input:<%- imp.input ? toTypeScriptType(imp.input
       return Memory.find(ptr).readJsonObject();
     <% } else { -%>
       const output = Memory.find(ptr).readJsonObject();
-      return <%= toTypeScriptType(imp.output) %>.fromJson(output)
+      return <%- toTypeScriptType(imp.output) %>.fromJson(output)
     <% } -%>
   <% } else if (isUtf8Encoded(imp.output)) { -%>
     return Memory.find(ptr).readString();

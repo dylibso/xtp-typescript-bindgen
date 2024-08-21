@@ -67,16 +67,16 @@ So `src/index.d.ts.ejs` will become `src/index.d.ts`. It might start off like th
 
 declare module 'main' {
 <% ctx.schema.exports.forEach(e => { %>
-  export function <% toCamelCase(e.name) %>(): I32;
-<%- } %>
+  export function <%- toCamelCase(e.name) %>(): I32;
+<% } %>
 }
 
 <% if (ctx.schema.imports.length > 0) { %>
 declare module 'extism:host' {
   interface user {
   <% ctx.schema.import.forEach(i => { %>
-    <% toCamelCase(i.name) %>(ptr: I64): I64;
-  <%- end %>
+    <%- toCamelCase(i.name) %>(ptr: I64): I64;
+  <% } %>
   }
 }
 <% } %>

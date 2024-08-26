@@ -77,7 +77,7 @@ export enum <%- schema.name %> {
  * @returns {<%- toTypeScriptType(imp.output) %>} <%- formatCommentLine(imp.output.description) %>
 <% } -%>
  */
-export function <%- imp.name %>(input:<%- imp.input ? toTypeScriptType(imp.input) : 'any' %>) <%- imp.output ? `:${toTypeScriptType(imp.output)}` : null %> {
+export function <%- imp.name %>(<%- imp.input ? `input: ${toTypeScriptType(imp.input)}` : null %>) <%- imp.output ? `:${toTypeScriptType(imp.output)}` : null %> {
 <% if (imp.input) { -%>
   <% if (isJsonEncoded(imp.input)) { -%>
     <% if (isPrimitive(imp.input)) { %>

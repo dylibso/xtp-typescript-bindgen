@@ -8,7 +8,7 @@ declare module 'main' {
 declare module 'extism:host' {
   interface user {
 <% schema.imports.forEach(im => { -%>
-  <%- im.name %>(ptr: I64): I64;
+  <%- im.name %>(<% if (im.input) { %>ptr: I64<% } %>)<% if (im.output) { %>: I64<% } %>;
 <% }) -%>
   }
 }

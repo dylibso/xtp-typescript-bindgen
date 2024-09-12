@@ -1,4 +1,20 @@
 exports:
+  topLevelBuffJSON:
+    description: Top level json buffers
+    input:
+      type: buffer
+      contentType: application/json
+    output:
+      type: buffer
+      contentType: application/json
+  topLevelBuffRaw:
+    description: Top level json buffers
+    input:
+      type: buffer
+      contentType: application/x-binary
+    output:
+      type: buffer
+      contentType: application/x-binary
   voidFunc:
     description: "This demonstrates how you can create an export with\nno inputs or
       outputs. \n"

@@ -5,6 +5,8 @@ function needsCasting(p: Property | Parameter): boolean {
   if (p.$ref) return true
 
   switch (p.type) {
+    case "buffer":
+      return true
     case "string":
       if (p.format === 'date-time') return true
       return false
@@ -61,11 +63,17 @@ function toTypeScriptType(property: Property | Parameter): string {
   return `${tp} | null`
 }
 
+// TODO: can move this helper up to shared library?
+function isBuffer(property: Property | Parameter): boolean {
+  return property.type === 'buffer'
+}
+
 export function render() {
   const tmpl = Host.inputString()
   const ctx = {
     ...getContext(),
     ...helpers,
+    isBuffer,
     toTypeScriptType,
     needsCasting,
   }

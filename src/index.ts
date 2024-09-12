@@ -1,20 +1,6 @@
 import ejs from 'ejs'
 import { helpers, getContext, Property, Parameter } from "@dylibso/xtp-bindgen"
 
-function needsCasting(p: Property | Parameter): boolean {
-  if (p.$ref) return true
-
-  switch (p.type) {
-    case "buffer":
-      return true
-    case "string":
-      if (p.format === 'date-time') return true
-      return false
-    default:
-      return false
-  }
-}
-
 function toTypeScriptType(property: Property | Parameter): string {
   let tp
   if (property.$ref) {

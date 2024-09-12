@@ -61,7 +61,6 @@ export function render() {
     ...helpers,
     isBuffer,
     toTypeScriptType,
-    needsCasting,
   }
   const output = ejs.render(tmpl, ctx)
   Host.outputString(output)

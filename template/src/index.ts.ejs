@@ -11,7 +11,9 @@ import {
 export function <%- ex.name %>(): number {
   <% if (ex.input) { -%>
     <% if (isJsonEncoded(ex.input)) { -%>
-      <% if (isPrimitive(ex.input)) { -%>
+      <% if (isBuffer(ex.input)) { -%>
+        const input: <%- toTypeScriptType(ex.input) %> = Host.base64ToArrayBuffer(JSON.parse(Host.inputString()))
+      <% } else if (isPrimitive(ex.input)) { -%>
         const input: <%- toTypeScriptType(ex.input) %> = JSON.parse(Host.inputString())
       <% } else { -%>
         const untypedInput = JSON.parse(Host.inputString())
@@ -38,7 +40,9 @@ export function <%- ex.name %>(): number {
 
   <% if (ex.output) { -%>
     <% if (isJsonEncoded(ex.output)) { -%>
-      <% if (isPrimitive(ex.output)) { -%>
+      <% if (isBuffer(ex.output)) { -%>
+        Host.outputString(JSON.stringify(Host.arrayBufferToBase64(output)))
+      <% } else if (isPrimitive(ex.output)) { -%>
         Host.outputString(JSON.stringify(output))
       <% } else { -%>
         const untypedOutput = <%- toTypeScriptType(ex.output) %>.toJson(output)

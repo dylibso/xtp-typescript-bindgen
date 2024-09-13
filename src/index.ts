@@ -1,18 +1,6 @@
 import ejs from 'ejs'
 import { helpers, getContext, Property, Parameter } from "@dylibso/xtp-bindgen"
 
-function needsCasting(p: Property | Parameter): boolean {
-  if (p.$ref) return true
-
-  switch (p.type) {
-    case "string":
-      if (p.format === 'date-time') return true
-      return false
-    default:
-      return false
-  }
-}
-
 function toTypeScriptType(property: Property | Parameter): string {
   let tp
   if (property.$ref) {
@@ -61,13 +49,18 @@ function toTypeScriptType(property: Property | Parameter): string {
   return `${tp} | null`
 }
 
+// TODO: can move this helper up to shared library?
+function isBuffer(property: Property | Parameter): boolean {
+  return property.type === 'buffer'
+}
+
 export function render() {
   const tmpl = Host.inputString()
   const ctx = {
     ...getContext(),
     ...helpers,
+    isBuffer,
     toTypeScriptType,
-    needsCasting,
   }
   const output = ejs.render(tmpl, ctx)
   Host.outputString(output)

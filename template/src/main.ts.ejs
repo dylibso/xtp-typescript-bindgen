@@ -20,7 +20,7 @@ import {
  * <%- formatCommentBlock(ex.description) %>
  *
 <% if (hasComment(ex.input)) { -%>
- * @param input {<%- toTypeScriptType(ex.input) %>} <%- formatCommentLine(ex.input.description) %>
+ * @param {<%- toTypeScriptType(ex.input) %>} input - <%- formatCommentLine(ex.input.description) %>
 <% } -%>
 <% if (hasComment(ex.output)) { -%>
  * @returns {<%- toTypeScriptType(ex.output) %>} <%- formatCommentLine(ex.output.description) %>

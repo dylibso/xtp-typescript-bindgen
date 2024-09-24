@@ -71,7 +71,7 @@ export enum <%- schema.name %> {
  * <%- formatCommentBlock(imp.description) %>
  *
 <% if (hasComment(imp.input)) { -%>
- * @param input {<%- toTypeScriptType(imp.input) %>} <%- formatCommentLine(imp.input.description) %>
+ * @param {<%- toTypeScriptType(imp.input) %>} input - <%- formatCommentLine(imp.input.description) %>
 <% } -%>
 <% if (hasComment(imp.output)) { -%>
  * @returns {<%- toTypeScriptType(imp.output) %>} <%- formatCommentLine(imp.output.description) %>

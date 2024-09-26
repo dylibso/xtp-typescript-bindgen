@@ -1,8 +1,4 @@
 template-suffix: ejs
-dependencies:
-  - node
-  - npm
-  - extism-js
 
 available-feature-flags:
   - name: stub-with-code-samples

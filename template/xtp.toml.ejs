@@ -9,10 +9,10 @@ name = "<%- project.name %>"
 
 [scripts]
 # xtp plugin build runs this script to generate the wasm file
-build = "npm run build"
+build = "sh prepare.sh && npm run build"
 
 # xtp plugin init runs this script to format the code
 format = "npm run format"
 
 # xtp plugin init runs this script before running the format script
-prepare = "npm install"
+prepare = "sh prepare.sh && npm install"

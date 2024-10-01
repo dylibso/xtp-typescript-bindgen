@@ -25,11 +25,11 @@ export class <%- schema.name %> {
       ...obj,
       <% schema.properties.forEach(p => { -%>
         <% if (isDateTime(p)) { -%>
-          <%- p.name -%>: obj.<%- p.name -%> ? new Date(obj.<%- p.name -%>) : null,
+          <%- p.name -%>: obj.<%- p.name -%> == null ? obj.<%- p.name %> : new Date(obj.<%- p.name -%>),
         <% } else if (isBuffer(p)) {-%>
-          <%- p.name -%>: obj.<%- p.name -%> ? Host.base64ToArrayBuffer(obj.<%- p.name -%>) : null,
+          <%- p.name -%>: obj.<%- p.name -%> == null ? obj.<%- p.name %> : Host.base64ToArrayBuffer(obj.<%- p.name -%>),
         <% } else if (!isPrimitive(p)) {-%>
-          <%- p.name -%>: obj.<%- p.name -%> ? <%- p.$ref.name %>.fromJson(obj.<%- p.name -%>) : null,
+          <%- p.name -%>: obj.<%- p.name -%> == null ? obj.<%- p.name %> : <%- p.$ref.name %>.fromJson(obj.<%- p.name -%>),
         <% } -%>
       <% }) -%>
     }
@@ -40,11 +40,11 @@ export class <%- schema.name %> {
       ...obj,
       <% schema.properties.forEach(p => { -%>
         <% if (p.type === "string" && p.format === "date-time") { -%>
-          <%- p.name -%>: obj.<%- p.name -%> ? obj.<%- p.name %>.toISOString() : null,
+          <%- p.name -%>: obj.<%- p.name -%> == null ? obj.<%- p.name %> : obj.<%- p.name %>.toISOString(),
         <% } else if (isBuffer(p)) {-%>
-          <%- p.name -%>: obj.<%- p.name -%> ? Host.arrayBufferToBase64(obj.<%- p.name -%>) : null,
+          <%- p.name -%>: obj.<%- p.name -%> == null ? obj.<%- p.name %> : Host.arrayBufferToBase64(obj.<%- p.name -%>),
         <% } else if (p.$ref && !p.$ref.enum) {-%>
-          <%- p.name -%>: obj.<%- p.name -%> ? <%- p.$ref.name %>.toJson(obj.<%- p.name -%>) : null,
+          <%- p.name -%>: obj.<%- p.name -%> == null ? obj.<%- p.name %>: <%- p.$ref.name %>.toJson(obj.<%- p.name -%>) ,
         <% } -%>
       <% }) -%>
     }

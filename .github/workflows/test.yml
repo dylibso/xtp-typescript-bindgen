@@ -15,9 +15,8 @@ jobs:
 
       - name: Setup Extism and XTP
         run: |
-          curl -O https://raw.githubusercontent.com/extism/js-pdk/main/install.sh
-          sh install.sh
-          curl https://static.dylibso.com/cli/install.sh | sh
+          curl https://raw.githubusercontent.com/extism/js-pdk/main/install.sh | bash
+          curl https://static.dylibso.com/cli/install.sh | bash
 
       - name: Set up Node.js
         uses: actions/setup-node@v3

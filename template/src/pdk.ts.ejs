@@ -57,7 +57,14 @@ export class <%- schema.name %> {
  */
 export enum <%- schema.name %> {
   <% schema.enum.forEach(variant => { -%>
-    <%- variant %> = "<%- variant %>",
+    <%- variant
+        // "host:foo$bar" -> "host_Foo$bar"
+        .replace(/[^a-zA-Z0-9_$]+(.)?/g, (a, m) => '_' + (m ||'').toUpperCase())
+        // "13" -> "$13" ("$" is a valid identifier char; with apologies to jquery)
+        .replace(/^([^a-zA-Z_$])/, (a, m) => `$${m}`)
+        // "host_Foo_Bar" -> "Host_Foo_Bar"
+        .replace(/^(.)/, (a, m) => m.toUpperCase())
+    %> = "<%- variant %>",
   <% }) -%>
 }
 

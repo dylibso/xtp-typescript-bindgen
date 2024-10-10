@@ -110,6 +110,11 @@ components:
       description: A set of all the enemies of pac-man
     ComplexObject:
       properties:
+        arrayOfDate:
+          type: array
+          items:
+            type: string
+            format: date-time
         ghost:
           "$ref": "#/components/schemas/GhostGang"
           description: I can override the description for the property here

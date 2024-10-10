@@ -2,6 +2,30 @@
 const hostFunctions = Host.getFunctions()
 <% } %>
 
+function isNull(v: any): boolean {
+  return v === undefined || v === null
+}
+
+function cast(caster: (v: any) => any, v: any): any {
+  if (isNull(v)) return v
+  if (Array.isArray(v)) return v.map(caster)
+  return caster(v)
+}
+
+function dateToJson(v: Date): string {
+  return v.toISOString()
+}
+function dateFromJson(v: string): Date {
+  return new Date(v)
+}
+
+function bufferToJson(v: ArrayBuffer): string {
+  return Host.arrayBufferToBase64(v)
+}
+function bufferFromJson(v: string): ArrayBuffer {
+  return Host.base64ToArrayBuffer(v)
+}
+
 <% Object.values(schema.schemas).forEach(schema => { %>
   <% if (schema.properties.length > 0) { %>
 
@@ -24,12 +48,14 @@ export class <%- schema.name %> {
     return {
       ...obj,
       <% schema.properties.forEach(p => { -%>
-        <% if (isDateTime(p)) { -%>
-          <%- p.name -%>: obj.<%- p.name -%> === undefined || obj.<%- p.name -%> === null ? obj.<%- p.name %> : new Date(obj.<%- p.name -%>),
-        <% } else if (isBuffer(p)) {-%>
-          <%- p.name -%>: obj.<%- p.name -%> === undefined || obj.<%- p.name -%> === null ? obj.<%- p.name %> : Host.base64ToArrayBuffer(obj.<%- p.name -%>),
-        <% } else if (!isPrimitive(p)) {-%>
-          <%- p.name -%>: obj.<%- p.name -%> === undefined || obj.<%- p.name -%> === null ? obj.<%- p.name %> : <%- p.$ref.name %>.fromJson(obj.<%- p.name -%>),
+        <% let baseP = p.items ? p.items : p -%>
+        <% let baseRef = p.$ref ? p.$ref.name : (p.items && p.items.$ref ? p.items.$ref.name : null)  -%>
+        <% if (isDateTime(baseP)) { -%>
+          <%- p.name -%>: cast(dateFromJson, obj.<%- p.name -%>),
+        <% } else if (isBuffer(baseP)) {-%>
+          <%- p.name -%>: cast(bufferFromJson, obj.<%- p.name -%>),
+        <% } else if (!isPrimitive(baseP)) {-%>
+          <%- p.name -%>: cast(<%- baseRef -%>.fromJson, obj.<%- p.name -%>),
         <% } -%>
       <% }) -%>
     }
@@ -39,12 +65,14 @@ export class <%- schema.name %> {
     return {
       ...obj,
       <% schema.properties.forEach(p => { -%>
-        <% if (p.type === "string" && p.format === "date-time") { -%>
-          <%- p.name -%>: obj.<%- p.name -%> === undefined || obj.<%- p.name -%> === null ? obj.<%- p.name %> : obj.<%- p.name %>.toISOString(),
-        <% } else if (isBuffer(p)) {-%>
-          <%- p.name -%>: obj.<%- p.name -%> === undefined || obj.<%- p.name -%> === null ? obj.<%- p.name %> : Host.arrayBufferToBase64(obj.<%- p.name -%>),
-        <% } else if (p.$ref && !p.$ref.enum) {-%>
-          <%- p.name -%>: obj.<%- p.name -%> === undefined || obj.<%- p.name -%> === null ? obj.<%- p.name %>: <%- p.$ref.name %>.toJson(obj.<%- p.name -%>) ,
+        <% let baseP = p.items ? p.items : p -%>
+        <% let baseRef = p.$ref ? p.$ref.name : (p.items && p.items.$ref ? p.items.$ref.name : null)  -%>
+        <% if (isDateTime(baseP)) { -%>
+          <%- p.name -%>: cast(dateToJson, obj.<%- p.name -%>),
+        <% } else if (isBuffer(baseP)) {-%>
+          <%- p.name -%>: cast(bufferToJson, obj.<%- p.name -%>),
+        <% } else if (!isPrimitive(baseP)) {-%>
+          <%- p.name -%>: cast(<%- baseRef -%>.toJson, obj.<%- p.name -%>),
         <% } -%>
       <% }) -%>
     }

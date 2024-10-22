@@ -12,6 +12,26 @@ function cast(caster: (v: any) => any, v: any): any {
   return caster(v)
 }
 
+function mapFromJson<T>(obj: any, cast: (value: any) => T): Record<string, T> {
+  const result: Record<string, T> = {};
+  
+  for (const [key, value] of Object.entries(obj)) {
+      result[key] = cast(value);
+  }
+  
+  return result;
+}
+
+function mapToJson<T>(obj: Record<string, T>, cast: (value: T) => any): Record<string, any> {
+  const result: Record<string, any> = {};
+  
+  for (const [key, value] of Object.entries(obj)) {
+    result[key] = cast(value);
+  }
+  
+  return result;
+}
+
 function dateToJson(v: Date): string {
   return v.toISOString()
 }
@@ -48,31 +68,21 @@ export class <%- schema.name %> {
     return {
       ...obj,
       <% schema.properties.forEach(p => { -%>
-        <% let baseP = p.items ? p.items : p -%>
-        <% let baseRef = p.$ref ? p.$ref.name : (p.items && p.items.$ref ? p.items.$ref.name : null)  -%>
-        <% if (isDateTime(baseP)) { -%>
-          <%- p.name -%>: cast(dateFromJson, obj.<%- p.name -%>),
-        <% } else if (isBuffer(baseP)) {-%>
-          <%- p.name -%>: cast(bufferFromJson, obj.<%- p.name -%>),
-        <% } else if (!isPrimitive(baseP)) {-%>
-          <%- p.name -%>: cast(<%- baseRef -%>.fromJson, obj.<%- p.name -%>),
+        <% let prop = getPropertyValue(p) -%>
+        <% if (prop) { -%>
+          <%- p.name -%>: <%- prop %>,
         <% } -%>
       <% }) -%>
     }
   }
 
-  static toJson(obj: <%- schema.name %>): any{
+  static toJson(obj: <%- schema.name %>): any {
     return {
       ...obj,
       <% schema.properties.forEach(p => { -%>
-        <% let baseP = p.items ? p.items : p -%>
-        <% let baseRef = p.$ref ? p.$ref.name : (p.items && p.items.$ref ? p.items.$ref.name : null)  -%>
-        <% if (isDateTime(baseP)) { -%>
-          <%- p.name -%>: cast(dateToJson, obj.<%- p.name -%>),
-        <% } else if (isBuffer(baseP)) {-%>
-          <%- p.name -%>: cast(bufferToJson, obj.<%- p.name -%>),
-        <% } else if (!isPrimitive(baseP)) {-%>
-          <%- p.name -%>: cast(<%- baseRef -%>.toJson, obj.<%- p.name -%>),
+        <% let prop = getPropertyToJsonValue(p) -%>
+        <% if (prop) { -%>
+          <%- p.name %>: <%- prop %>,
         <% } -%>
       <% }) -%>
     }

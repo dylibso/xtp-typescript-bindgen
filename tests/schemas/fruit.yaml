@@ -1,4 +1,17 @@
 exports:
+  mapExport:
+    description: This demonstrates how you can create an export that takes a map of
+      strings and returns a map of strings.
+    input:
+      type: object
+      additionalProperties:
+        type: string
+      description: A map of strings
+    output:
+      type: object
+      additionalProperties:
+        type: string
+      description: A map of strings
   topLevelBuffJSON:
     description: Top level json buffers
     input:
@@ -85,6 +98,11 @@ imports:
 version: v1-draft
 components:
   schemas:
+    AMapSchema:
+      type: object
+      additionalProperties:
+        type: string
+      description: A map of strings
     WriteParams:
       properties:
         key:
@@ -138,4 +156,17 @@ components:
         writeParams:
           "$ref": "#/components/schemas/WriteParams"
           nullable: true
+        anIntMap:
+          type: object
+          additionalProperties:
+            type: integer
+            format: int32
+          description: A map of integers
+        anObjectMap:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/WriteParams"
+        refToMap:
+          "$ref": "#/components/schemas/AMapSchema"
+          description: A complex json object
       description: A complex json object

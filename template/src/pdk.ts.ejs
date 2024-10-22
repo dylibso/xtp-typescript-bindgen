@@ -106,6 +106,13 @@ export enum <%- schema.name %> {
   <% }) -%>
 }
 
+  <% } else if (isMap(schema)) { %>
+
+/**
+* <%- formatCommentLine(schema.description) %>
+*/
+export type <%- schema.name %> = <%- toTypeScriptType(schema) %>
+
   <% } %>
 
 <% }) %>

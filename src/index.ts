@@ -77,6 +77,8 @@ function getPropertyValue(prop: Property): string | null {
     return `cast(bufferFromJson, obj.${prop.name})`;
   } else if (helpers.isMap(prop)) {
     return getMapConverter(prop);
+  } else if (baseP.$ref?.additionalProperties) {
+    return getMapConverter((baseP.$ref as any) as Property);
   } else if (!helpers.isPrimitive(baseP)) {
     return `cast(${baseRef}.fromJson, obj.${prop.name})`;
   }
@@ -106,6 +108,11 @@ function getPropertyToJsonValue(prop: Property): string | null {
   } else if (isBuffer(baseP)) {
     return `cast(bufferToJson, obj.${prop.name})`;
   } else if (helpers.isMap(prop)) {
+    return getMapToJsonConverter(prop);
+  } else if (baseP.$ref?.additionalProperties) {
+    let prop  = (baseP.$ref as any) as Property
+    prop.name = baseP.name
+
     return getMapToJsonConverter(prop);
   } else if (!helpers.isPrimitive(baseP)) {
     return `cast(${baseRef}.toJson, obj.${prop.name})`;

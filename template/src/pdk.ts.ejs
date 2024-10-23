@@ -40,8 +40,8 @@ export class <%- schema.name %> {
    * <%- formatCommentBlock(p.description) %>
    */
   <% } -%>
-  <%- (p.nullable || toTypeScriptType(p) === 'any') ? null : '// @ts-expect-error TS2564\n' -%>
-  <%- p.name %><%- p.nullable ? '?' : null %>: <%- toTypeScriptType(p) %>;
+  <%- (!p.required || toTypeScriptType(p) === 'any') ? null : '// @ts-expect-error TS2564\n' -%>
+  <%- p.name %><%- !p.required ? '?' : null %>: <%- toTypeScriptType(p) %>;
   <% }) %>
 
   static fromJson(obj: any): <%- schema.name %> {

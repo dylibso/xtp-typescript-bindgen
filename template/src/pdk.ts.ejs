@@ -14,6 +14,8 @@ function cast(caster: (v: any) => any, v: any): any {
 
 export function mapFromJson<T>(obj: any, cast: (value: any) => T): Record<string, T> {
   const result: Record<string, T> = {};
+
+  if (!obj) return result
   
   for (const [key, value] of Object.entries(obj)) {
       result[key] = cast(value);
@@ -25,6 +27,8 @@ export function mapFromJson<T>(obj: any, cast: (value: any) => T): Record<string
 export function mapToJson<T>(obj: Record<string, T>, cast: (value: T) => any): any {
   const result: Record<string, any> = {};
   
+  if (!obj) return result
+
   for (const [key, value] of Object.entries(obj)) {
     result[key] = cast(value);
   }

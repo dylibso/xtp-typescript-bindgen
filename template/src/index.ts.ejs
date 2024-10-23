@@ -4,6 +4,9 @@ import {
   <% Object.values(schema.schemas).forEach(schema => { -%>
     <%- schema.name %>,
   <% }) -%>
+
+  mapFromJson,
+  mapToJson,
 } from './pdk'
 <% } %>
 
@@ -14,7 +17,10 @@ export function <%- ex.name %>(): number {
       <% if (isBuffer(ex.input)) { -%>
         const input: <%- toTypeScriptType(ex.input) %> = Host.base64ToArrayBuffer(JSON.parse(Host.inputString()))
       <% } else if (isPrimitive(ex.input)) { -%>
-        const input: <%- toTypeScriptType(ex.input) %> = JSON.parse(Host.inputString())
+        const input: <%- toTypeScriptType(ex.input) %> = JSON.parse(Host.inputString()) 
+      <% } else if (isMap(ex.input)) { -%>
+        const untypedInput = JSON.parse(Host.inputString())
+        const input = <%- deserializeMapFromSource('untypedInput', ex.input) %>
       <% } else { -%>
         const untypedInput = JSON.parse(Host.inputString())
         const input = <%- toTypeScriptType(ex.input) %>.fromJson(untypedInput)
@@ -44,6 +50,9 @@ export function <%- ex.name %>(): number {
         Host.outputString(JSON.stringify(Host.arrayBufferToBase64(output)))
       <% } else if (isPrimitive(ex.output)) { -%>
         Host.outputString(JSON.stringify(output))
+      <% } else if (isMap(ex.input)) { -%>
+        const untypedOutput = <%- serializeMapFromSource('output', ex.input) %>
+        Host.outputString(JSON.stringify(untypedOutput))
       <% } else { -%>
         const untypedOutput = <%- toTypeScriptType(ex.output) %>.toJson(output)
         Host.outputString(JSON.stringify(untypedOutput))

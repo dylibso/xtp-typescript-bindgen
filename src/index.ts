@@ -1,5 +1,5 @@
 import ejs from 'ejs'
-import { helpers, getContext, Property, Parameter,  } from "@dylibso/xtp-bindgen"
+import { helpers, getContext, Property, Parameter, } from "@dylibso/xtp-bindgen"
 
 function toTypeScriptType(property: Property | Parameter): string {
   let tp
@@ -46,7 +46,7 @@ function toTypeScriptType(property: Property | Parameter): string {
     }
   }
 
-  if (!tp) throw new Error("Cant convert property to typescript type: " + property.type)
+  if (!tp) throw new Error("Cant convert property to typescript type: " + JSON.stringify(property))
   if (!property.nullable) return tp
   return `${tp} | null`
 }
@@ -67,69 +67,72 @@ function getBaseRef(property: Property): string {
   return property.$ref?.name || ''
 }
 
-function getPropertyValue(prop: Property): string | null {
+function deserializeProperty(prop: Property): string | null {
   const baseP = (prop.items ? prop.items : prop) as Property;
   const baseRef = getBaseRef(prop);
-  
+
   if (helpers.isDateTime(baseP)) {
     return `cast(dateFromJson, obj.${prop.name})`;
   } else if (isBuffer(baseP)) {
     return `cast(bufferFromJson, obj.${prop.name})`;
   } else if (helpers.isMap(prop)) {
-    return getMapConverter(prop);
+    return deserializeMapFromSource(`obj.${prop.name}`, prop);
   } else if (baseP.$ref?.additionalProperties) {
-    return getMapConverter((baseP.$ref as any) as Property);
+    return deserializeMapFromSource(`obj.${prop.name}`, (baseP.$ref as any) as Property);
   } else if (!helpers.isPrimitive(baseP)) {
     return `cast(${baseRef}.fromJson, obj.${prop.name})`;
   }
   return null;
 }
 
-// Helper function to handle map conversion
-function getMapConverter(prop: Property): string {
+function deserializeMapFromSource(source: string, prop: Property): string {
   if (helpers.isMap(prop.additionalProperties as Property)) {
     // Handle nested maps recursively
-    const innerConverter = getPropertyValue(prop.additionalProperties as Property);
-    return `mapFromJson(obj.${prop.name}, (v) => ${innerConverter})`;
-  } else if (!helpers.isPrimitive(prop.additionalProperties as Property)) {
-    const baseRef = getBaseRef(prop.additionalProperties as Property);
-    return `mapFromJson(obj.${prop.name}, ${baseRef}.fromJson)`;
+    const innerConverter = deserializeProperty(prop.additionalProperties as Property);
+    return `mapFromJson(${source}, (v) => ${innerConverter})`;
+  } 
+  
+  const baseP = (prop.additionalProperties?.items ? prop.additionalProperties.items : prop.additionalProperties) as Property;
+  const baseRef = getBaseRef(baseP);
+  
+  if (!helpers.isPrimitive(prop.additionalProperties as Property)) {
+    return `mapFromJson(${source}, ${baseRef}.fromJson)`;
   }
 
-  return `mapFromJson(obj.${prop.name}, (v: any) => v as ${toTypeScriptType(prop.additionalProperties as Property)})`;
+  return `mapFromJson(${source}, (v: any) => v as ${toTypeScriptType(baseP)})`;
 }
 
-function getPropertyToJsonValue(prop: Property): string | null {
+function serializeProperty(prop: Property): string | null {
   const baseP = (prop.items ? prop.items : prop) as Property;
   const baseRef = getBaseRef(prop);
-  
+
   if (helpers.isDateTime(baseP)) {
     return `cast(dateToJson, obj.${prop.name})`;
   } else if (isBuffer(baseP)) {
     return `cast(bufferToJson, obj.${prop.name})`;
   } else if (helpers.isMap(prop)) {
-    return getMapToJsonConverter(prop);
+    return serializeMapFromSource(`obj.${prop.name}`, prop);
   } else if (baseP.$ref?.additionalProperties) {
-    let prop  = (baseP.$ref as any) as Property
+    let prop = (baseP.$ref as any) as Property
     prop.name = baseP.name
 
-    return getMapToJsonConverter(prop);
+    return serializeMapFromSource(`obj.${prop.name}`,prop);
   } else if (!helpers.isPrimitive(baseP)) {
     return `cast(${baseRef}.toJson, obj.${prop.name})`;
   }
   return null;
 }
 
-function getMapToJsonConverter(prop: Property): string {
+function serializeMapFromSource(source: string, prop: Property): string {
   if (helpers.isMap(prop.additionalProperties as Property)) {
     // Handle nested maps recursively
-    const innerConverter = getPropertyToJsonValue(prop.additionalProperties as Property);
-    return `mapToJson(obj.${prop.name}, (v) => ${innerConverter})`;
+    const innerConverter = serializeProperty(prop.additionalProperties as Property);
+    return `mapToJson(${source}, (v) => ${innerConverter})`;
   } else if (!helpers.isPrimitive(prop.additionalProperties as Property)) {
     const baseRef = getBaseRef(prop.additionalProperties as Property);
-    return `mapToJson(obj.${prop.name}, ${baseRef}.toJson)`;
+    return `mapToJson(${source}, ${baseRef}.toJson)`;
   }
-  return `obj.${prop.name}`;
+  return source;
 }
 
 
@@ -146,8 +149,10 @@ export function render() {
     isBuffer,
     toTypeScriptType,
     getBaseRef,
-    getPropertyValue,
-    getPropertyToJsonValue
+    serializeProperty,
+    serializeMapFromSource,
+    deserializeProperty,
+    deserializeMapFromSource
   }
   const output = ejs.render(tmpl, ctx)
   Host.outputString(output)

@@ -12,7 +12,7 @@ function cast(caster: (v: any) => any, v: any): any {
   return caster(v)
 }
 
-function mapFromJson<T>(obj: any, cast: (value: any) => T): Record<string, T> {
+export function mapFromJson<T>(obj: any, cast: (value: any) => T): Record<string, T> {
   const result: Record<string, T> = {};
   
   for (const [key, value] of Object.entries(obj)) {
@@ -22,7 +22,7 @@ function mapFromJson<T>(obj: any, cast: (value: any) => T): Record<string, T> {
   return result;
 }
 
-function mapToJson<T>(obj: Record<string, T>, cast: (value: T) => any): Record<string, any> {
+export function mapToJson<T>(obj: Record<string, T>, cast: (value: T) => any): Record<string, any> {
   const result: Record<string, any> = {};
   
   for (const [key, value] of Object.entries(obj)) {
@@ -68,7 +68,7 @@ export class <%- schema.name %> {
     return {
       ...obj,
       <% schema.properties.forEach(p => { -%>
-        <% let prop = getPropertyValue(p) -%>
+        <% let prop = deserializeProperty(p) -%>
         <% if (prop) { -%>
           <%- p.name -%>: <%- prop %>,
         <% } -%>
@@ -80,7 +80,7 @@ export class <%- schema.name %> {
     return {
       ...obj,
       <% schema.properties.forEach(p => { -%>
-        <% let prop = getPropertyToJsonValue(p) -%>
+        <% let prop = serializeProperty(p) -%>
         <% if (prop) { -%>
           <%- p.name %>: <%- prop %>,
         <% } -%>

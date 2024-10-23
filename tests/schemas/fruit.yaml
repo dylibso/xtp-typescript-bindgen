@@ -5,13 +5,16 @@ exports:
     input:
       type: object
       additionalProperties:
-        type: string
+        items:
+          type: string
       description: A map of strings
+      contentType: application/json
     output:
       type: object
       additionalProperties:
         type: string
       description: A map of strings
+      contentType: application/json
   topLevelBuffJSON:
     description: Top level json buffers
     input:

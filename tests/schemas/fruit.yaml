@@ -5,14 +5,17 @@ exports:
     input:
       type: object
       additionalProperties:
+        type: array
         items:
-          type: string
+          $ref: "#/components/schemas/WriteParams"
       description: A map of strings
       contentType: application/json
     output:
       type: object
       additionalProperties:
-        type: string
+        type: array
+        items:
+          type: string
       description: A map of strings
       contentType: application/json
   topLevelBuffJSON:
@@ -71,6 +74,23 @@ exports:
       contentType: application/json
       $ref: "#/components/schemas/ComplexObject"
 imports:
+  mapImport:
+    input:
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          $ref: "#/components/schemas/WriteParams"
+      description: A map of strings
+      contentType: application/json
+    output:
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          type: string
+      description: A map of strings
+      contentType: application/json
   eatAFruit:
     input:
       contentType: text/plain; charset=utf-8
@@ -94,18 +114,12 @@ imports:
       description: the raw byte values at key
   kv_write:
     description: kvwrite
-    contentType: application/json
     input:
       contentType: application/json
       "$ref": "#/components/schemas/WriteParams"
 version: v1-draft
 components:
   schemas:
-    AMapSchema:
-      type: object
-      additionalProperties:
-        type: string
-      description: A map of strings
     WriteParams:
       properties:
         key:
@@ -169,7 +183,4 @@ components:
           type: object
           additionalProperties:
             $ref: "#/components/schemas/WriteParams"
-        refToMap:
-          "$ref": "#/components/schemas/AMapSchema"
-          description: A complex json object
       description: A complex json object

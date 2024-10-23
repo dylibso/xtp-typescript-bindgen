@@ -22,7 +22,7 @@ export function mapFromJson<T>(obj: any, cast: (value: any) => T): Record<string
   return result;
 }
 
-export function mapToJson<T>(obj: Record<string, T>, cast: (value: T) => any): Record<string, any> {
+export function mapToJson<T>(obj: Record<string, T>, cast: (value: T) => any): any {
   const result: Record<string, any> = {};
   
   for (const [key, value] of Object.entries(obj)) {
@@ -106,13 +106,6 @@ export enum <%- schema.name %> {
   <% }) -%>
 }
 
-  <% } else if (isMap(schema)) { %>
-
-/**
-* <%- formatCommentLine(schema.description) %>
-*/
-export type <%- schema.name %> = <%- toTypeScriptType(schema) %>
-
   <% } %>
 
 <% }) %>
@@ -134,6 +127,9 @@ export function <%- imp.name %>(<%- imp.input ? `input: ${toTypeScriptType(imp.i
   <% if (isJsonEncoded(imp.input)) { -%>
     <% if (isPrimitive(imp.input)) { %>
       const mem = Memory.fromJsonObject(input as any)
+    <% } else if (isMap(imp.input)) { %>
+      const serialized = <%- serializeMapFromSource('input', imp.input) %>
+      const mem = Memory.fromJsonObject(serialized)
     <% } else { %>
       const casted = <%- toTypeScriptType(imp.input) %>.toJson(input)
       const mem = Memory.fromJsonObject(casted)
@@ -155,6 +151,9 @@ export function <%- imp.name %>(<%- imp.input ? `input: ${toTypeScriptType(imp.i
   <% if (isJsonEncoded(imp.output)) { -%>
     <% if (isPrimitive(imp.output)) { -%>
       return Memory.find(ptr).readJsonObject();
+    <% } else if (isMap(imp.output)) { -%>
+      const output = Memory.find(ptr).readJsonObject();
+      return <%- deserializeMapFromSource('output', imp.output) %>
     <% } else { -%>
       const output = Memory.find(ptr).readJsonObject();
       return <%- toTypeScriptType(imp.output) %>.fromJson(output)

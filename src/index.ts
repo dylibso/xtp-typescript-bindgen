@@ -77,8 +77,6 @@ function deserializeProperty(prop: Property): string | null {
     return `cast(bufferFromJson, obj.${prop.name})`;
   } else if (helpers.isMap(prop)) {
     return deserializeMapFromSource(`obj.${prop.name}`, prop);
-  } else if (baseP.$ref?.additionalProperties) {
-    return deserializeMapFromSource(`obj.${prop.name}`, (baseP.$ref as any) as Property);
   } else if (!helpers.isPrimitive(baseP)) {
     return `cast(${baseRef}.fromJson, obj.${prop.name})`;
   }
@@ -86,16 +84,41 @@ function deserializeProperty(prop: Property): string | null {
 }
 
 function deserializeMapFromSource(source: string, prop: Property): string {
-  if (helpers.isMap(prop.additionalProperties as Property)) {
-    // Handle nested maps recursively
-    const innerConverter = deserializeProperty(prop.additionalProperties as Property);
-    return `mapFromJson(${source}, (v) => ${innerConverter})`;
-  } 
-  
-  const baseP = (prop.additionalProperties?.items ? prop.additionalProperties.items : prop.additionalProperties) as Property;
+  // Handle array of maps
+  if (prop.additionalProperties?.items) {
+    const baseP = prop.additionalProperties.items as Property;
+    const baseRef = getBaseRef(baseP);
+
+    // If the array contains maps
+    if (helpers.isMap(baseP)) {
+      const valueP = baseP.additionalProperties as Property;
+      const valueRef = getBaseRef(valueP);
+
+      // For non-primitive map values
+      if (!helpers.isPrimitive(valueP)) {
+        return `mapFromJson(${source}, (arr: any[]): ${baseRef}[] => arr.map((v: any) => 
+          mapFromJson(v, ${valueRef}.fromJson)))`;
+      }
+
+      // For primitive map values (like strings, numbers)
+      return `mapFromJson(${source}, (arr: any[]): ${baseRef}[] => arr.map((v: any) => 
+        mapFromJson(v, (vv) => vv as ${toTypeScriptType(valueP)})))`;
+    }
+    
+    // Handle array of non-map objects
+    if (!helpers.isPrimitive(baseP)) {
+      return `mapFromJson(${source}, (arr: any[]): ${baseRef}[] => arr.map((v: any) => ${baseRef}.fromJson(v)))`;
+    }
+
+    // Handle array of primitives
+    return `mapFromJson(${source}, (arr: any[]): ${toTypeScriptType(baseP)}[] => arr.map((v: any) => v as ${toTypeScriptType(baseP)}))`;
+  }
+
+  // Handle base case (simple map)
+  const baseP = prop.additionalProperties as Property;
   const baseRef = getBaseRef(baseP);
-  
-  if (!helpers.isPrimitive(prop.additionalProperties as Property)) {
+
+  if (!helpers.isPrimitive(baseP)) {
     return `mapFromJson(${source}, ${baseRef}.fromJson)`;
   }
 
@@ -112,11 +135,6 @@ function serializeProperty(prop: Property): string | null {
     return `cast(bufferToJson, obj.${prop.name})`;
   } else if (helpers.isMap(prop)) {
     return serializeMapFromSource(`obj.${prop.name}`, prop);
-  } else if (baseP.$ref?.additionalProperties) {
-    let prop = (baseP.$ref as any) as Property
-    prop.name = baseP.name
-
-    return serializeMapFromSource(`obj.${prop.name}`,prop);
   } else if (!helpers.isPrimitive(baseP)) {
     return `cast(${baseRef}.toJson, obj.${prop.name})`;
   }
@@ -124,17 +142,46 @@ function serializeProperty(prop: Property): string | null {
 }
 
 function serializeMapFromSource(source: string, prop: Property): string {
-  if (helpers.isMap(prop.additionalProperties as Property)) {
-    // Handle nested maps recursively
-    const innerConverter = serializeProperty(prop.additionalProperties as Property);
-    return `mapToJson(${source}, (v) => ${innerConverter})`;
-  } else if (!helpers.isPrimitive(prop.additionalProperties as Property)) {
-    const baseRef = getBaseRef(prop.additionalProperties as Property);
+  // Handle array of maps
+  if (prop.additionalProperties?.items) {
+    const baseP = prop.additionalProperties.items as Property;
+    const baseRef = getBaseRef(baseP);
+
+    // If the array contains maps
+    if (helpers.isMap(baseP)) {
+      const valueP = baseP.additionalProperties as Property;
+      const valueRef = getBaseRef(valueP);
+
+      // For non-primitive map values
+      if (!helpers.isPrimitive(valueP)) {
+        return `mapToJson(${source}, (arr) => arr.map((v) => 
+          mapToJson(v, ${valueRef}.toJson)))`;
+      }
+
+      // For primitive map values (like strings, numbers)
+      return `mapToJson(${source}, (arr) => arr.map((v) => 
+        mapToJson(v, (vv) => vv)))`;
+    }
+    
+    // Handle array of non-map objects
+    if (!helpers.isPrimitive(baseP)) {
+      return `mapToJson(${source}, (arr) => arr.map((v) => ${baseRef}.toJson(v)))`;
+    }
+
+    // Handle array of primitives
+    return `mapToJson(${source}, (arr) => arr.map((v) => v))`;
+  }
+
+  // Handle base case (simple map)
+  const baseP = prop.additionalProperties as Property;
+  const baseRef = getBaseRef(baseP);
+
+  if (!helpers.isPrimitive(baseP)) {
     return `mapToJson(${source}, ${baseRef}.toJson)`;
   }
-  return source;
-}
 
+  return `mapToJson(${source}, (v) => v)`;
+}
 
 // TODO: can move this helper up to shared library?
 function isBuffer(property: Property | Parameter): boolean {

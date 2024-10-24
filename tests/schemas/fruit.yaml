@@ -1,4 +1,23 @@
 exports:
+  mapExport:
+    description: This demonstrates how you can create an export that takes a map of
+      strings and returns a map of strings.
+    input:
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          $ref: "#/components/schemas/WriteParams"
+      description: A map of strings
+      contentType: application/json
+    output:
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          type: string
+      description: A map of strings
+      contentType: application/json
   topLevelBuffJSON:
     description: Top level json buffers
     input:
@@ -55,6 +74,23 @@ exports:
       contentType: application/json
       $ref: "#/components/schemas/ComplexObject"
 imports:
+  mapImport:
+    input:
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          $ref: "#/components/schemas/WriteParams"
+      description: A map of strings
+      contentType: application/json
+    output:
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          type: string
+      description: A map of strings
+      contentType: application/json
   eatAFruit:
     input:
       contentType: text/plain; charset=utf-8
@@ -78,7 +114,6 @@ imports:
       description: the raw byte values at key
   kv_write:
     description: kvwrite
-    contentType: application/json
     input:
       contentType: application/json
       "$ref": "#/components/schemas/WriteParams"
@@ -138,4 +173,14 @@ components:
         writeParams:
           "$ref": "#/components/schemas/WriteParams"
           nullable: true
+        anIntMap:
+          type: object
+          additionalProperties:
+            type: integer
+            format: int32
+          description: A map of integers
+        anObjectMap:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/WriteParams"
       description: A complex json object

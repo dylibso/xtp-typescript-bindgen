@@ -12,6 +12,30 @@ function cast(caster: (v: any) => any, v: any): any {
   return caster(v)
 }
 
+export function mapFromJson<T>(obj: any, cast: (value: any) => T): Record<string, T> {
+  const result: Record<string, T> = {};
+
+  if (!obj) return result
+  
+  for (const [key, value] of Object.entries(obj)) {
+      result[key] = cast(value);
+  }
+  
+  return result;
+}
+
+export function mapToJson<T>(obj: Record<string, T>, cast: (value: T) => any): any {
+  const result: Record<string, any> = {};
+  
+  if (!obj) return result
+
+  for (const [key, value] of Object.entries(obj)) {
+    result[key] = cast(value);
+  }
+  
+  return result;
+}
+
 function dateToJson(v: Date): string {
   return v.toISOString()
 }
@@ -48,31 +72,21 @@ export class <%- schema.name %> {
     return {
       ...obj,
       <% schema.properties.forEach(p => { -%>
-        <% let baseP = p.items ? p.items : p -%>
-        <% let baseRef = p.$ref ? p.$ref.name : (p.items && p.items.$ref ? p.items.$ref.name : null)  -%>
-        <% if (isDateTime(baseP)) { -%>
-          <%- p.name -%>: cast(dateFromJson, obj.<%- p.name -%>),
-        <% } else if (isBuffer(baseP)) {-%>
-          <%- p.name -%>: cast(bufferFromJson, obj.<%- p.name -%>),
-        <% } else if (!isPrimitive(baseP)) {-%>
-          <%- p.name -%>: cast(<%- baseRef -%>.fromJson, obj.<%- p.name -%>),
+        <% let prop = propertyParsingSnippet(p) -%>
+        <% if (prop) { -%>
+          <%- p.name -%>: <%- prop %>,
         <% } -%>
       <% }) -%>
     }
   }
 
-  static toJson(obj: <%- schema.name %>): any{
+  static toJson(obj: <%- schema.name %>): any {
     return {
       ...obj,
       <% schema.properties.forEach(p => { -%>
-        <% let baseP = p.items ? p.items : p -%>
-        <% let baseRef = p.$ref ? p.$ref.name : (p.items && p.items.$ref ? p.items.$ref.name : null)  -%>
-        <% if (isDateTime(baseP)) { -%>
-          <%- p.name -%>: cast(dateToJson, obj.<%- p.name -%>),
-        <% } else if (isBuffer(baseP)) {-%>
-          <%- p.name -%>: cast(bufferToJson, obj.<%- p.name -%>),
-        <% } else if (!isPrimitive(baseP)) {-%>
-          <%- p.name -%>: cast(<%- baseRef -%>.toJson, obj.<%- p.name -%>),
+        <% let prop = propertyToJsonSnippet(p) -%>
+        <% if (prop) { -%>
+          <%- p.name %>: <%- prop %>,
         <% } -%>
       <% }) -%>
     }
@@ -117,6 +131,9 @@ export function <%- imp.name %>(<%- imp.input ? `input: ${toTypeScriptType(imp.i
   <% if (isJsonEncoded(imp.input)) { -%>
     <% if (isPrimitive(imp.input)) { %>
       const mem = Memory.fromJsonObject(input as any)
+    <% } else if (isMap(imp.input)) { %>
+      const serialized = <%- mapToJsonSnippet('input', imp.input) %>
+      const mem = Memory.fromJsonObject(serialized)
     <% } else { %>
       const casted = <%- toTypeScriptType(imp.input) %>.toJson(input)
       const mem = Memory.fromJsonObject(casted)
@@ -138,6 +155,9 @@ export function <%- imp.name %>(<%- imp.input ? `input: ${toTypeScriptType(imp.i
   <% if (isJsonEncoded(imp.output)) { -%>
     <% if (isPrimitive(imp.output)) { -%>
       return Memory.find(ptr).readJsonObject();
+    <% } else if (isMap(imp.output)) { -%>
+      const output = Memory.find(ptr).readJsonObject();
+      return <%- mapParsingSnippet('output', imp.output) %>
     <% } else { -%>
       const output = Memory.find(ptr).readJsonObject();
       return <%- toTypeScriptType(imp.output) %>.fromJson(output)

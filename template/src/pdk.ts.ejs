@@ -72,7 +72,7 @@ export class <%- schema.name %> {
     return {
       ...obj,
       <% schema.properties.forEach(p => { -%>
-        <% let prop = deserializeProperty(p) -%>
+        <% let prop = propertyParsingSnippet(p) -%>
         <% if (prop) { -%>
           <%- p.name -%>: <%- prop %>,
         <% } -%>
@@ -84,7 +84,7 @@ export class <%- schema.name %> {
     return {
       ...obj,
       <% schema.properties.forEach(p => { -%>
-        <% let prop = serializeProperty(p) -%>
+        <% let prop = propertyToJsonSnippet(p) -%>
         <% if (prop) { -%>
           <%- p.name %>: <%- prop %>,
         <% } -%>
@@ -132,7 +132,7 @@ export function <%- imp.name %>(<%- imp.input ? `input: ${toTypeScriptType(imp.i
     <% if (isPrimitive(imp.input)) { %>
       const mem = Memory.fromJsonObject(input as any)
     <% } else if (isMap(imp.input)) { %>
-      const serialized = <%- serializeMapFromSource('input', imp.input) %>
+      const serialized = <%- mapToJsonSnippet('input', imp.input) %>
       const mem = Memory.fromJsonObject(serialized)
     <% } else { %>
       const casted = <%- toTypeScriptType(imp.input) %>.toJson(input)
@@ -157,7 +157,7 @@ export function <%- imp.name %>(<%- imp.input ? `input: ${toTypeScriptType(imp.i
       return Memory.find(ptr).readJsonObject();
     <% } else if (isMap(imp.output)) { -%>
       const output = Memory.find(ptr).readJsonObject();
-      return <%- deserializeMapFromSource('output', imp.output) %>
+      return <%- mapParsingSnippet('output', imp.output) %>
     <% } else { -%>
       const output = Memory.find(ptr).readJsonObject();
       return <%- toTypeScriptType(imp.output) %>.fromJson(output)

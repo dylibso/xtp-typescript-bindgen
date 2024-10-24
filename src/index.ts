@@ -82,47 +82,52 @@ function propertyParsingSnippet(prop: Property): string | null {
   }
   return null;
 }
-
 function mapParsingSnippet(source: string, prop: Property): string {
-  // Handle map of arrays
+  // Extract map's value type, handling both direct and array cases
+  const valueType = prop.additionalProperties?.items || prop.additionalProperties;
+  if (!valueType) return `mapFromJson(${source}, (v) => v)`;
+
+  // Get type annotation for the resulting map values
+  const typeAnnotation = getTypeAnnotation(valueType as Property);
+
+  // Generate converter based on value type
+  const valueConverter = buildParsingConverter(valueType as Property);
+
+  // Handle arrays
   if (prop.additionalProperties?.items) {
-    const baseP = prop.additionalProperties.items as Property;
-    const baseRef = getBaseRef(baseP);
-
-    // If the array contains maps
-    if (helpers.isMap(baseP)) {
-      const valueP = baseP.additionalProperties as Property;
-      const valueRef = getBaseRef(valueP);
-
-      // For non-primitive map values
-      if (!helpers.isPrimitive(valueP)) {
-        return `mapFromJson(${source}, (arr: any[]): ${baseRef}[] => arr.map((v: any) => 
-          mapFromJson(v, ${valueRef}.fromJson)))`;
-      }
-
-      // For primitive map values (like strings, numbers)
-      return `mapFromJson(${source}, (arr: any[]): ${baseRef}[] => arr.map((v: any) => 
-        mapFromJson(v, (vv) => vv as ${toTypeScriptType(valueP)})))`;
-    }
-    
-    // Handle array of non-map objects
-    if (!helpers.isPrimitive(baseP)) {
-      return `mapFromJson(${source}, (arr: any[]): ${baseRef}[] => arr.map((v: any) => ${baseRef}.fromJson(v)))`;
-    }
-
-    // Handle array of primitives
-    return `mapFromJson(${source}, (arr: any[]): ${toTypeScriptType(baseP)}[] => arr.map((v: any) => v as ${toTypeScriptType(baseP)}))`;
+    return `mapFromJson(${source}, (arr: any[]): ${typeAnnotation}[] => arr.map((v: any) => ${valueConverter}(v)))`;
   }
 
-  // Handle base case (simple map)
-  const baseP = prop.additionalProperties as Property;
-  const baseRef = getBaseRef(baseP);
+  // Handle simple maps
+  return `mapFromJson(${source}, ${valueConverter})`;
+}
 
-  if (!helpers.isPrimitive(baseP)) {
-    return `mapFromJson(${source}, ${baseRef}.fromJson)`;
+function buildParsingConverter(prop: Property): string {
+  // Handle nested maps
+  if (helpers.isMap(prop)) {
+    const innerValueType = prop.additionalProperties as Property;
+    const valueRef = getBaseRef(innerValueType);
+
+    if (!helpers.isPrimitive(innerValueType)) {
+      return `(v: any) => mapFromJson(v, ${valueRef}.fromJson)`;
+    }
+    return `(v: any) => mapFromJson(v, (vv) => vv as ${toTypeScriptType(innerValueType)})`;
   }
 
-  return `mapFromJson(${source}, (v: any) => v as ${toTypeScriptType(baseP)})`;
+  // Handle non-map types
+  const ref = getBaseRef(prop);
+  if (!helpers.isPrimitive(prop)) {
+    return `${ref}.fromJson`;
+  }
+  return `(v: any) => v as ${toTypeScriptType(prop)}`;
+}
+
+function getTypeAnnotation(prop: Property): string {
+  if (helpers.isMap(prop)) {
+    const valueType = prop.additionalProperties as Property;
+    return getBaseRef(valueType) || toTypeScriptType(valueType);
+  }
+  return getBaseRef(prop) || toTypeScriptType(prop);
 }
 
 function propertyToJsonSnippet(prop: Property): string | null {
@@ -142,45 +147,40 @@ function propertyToJsonSnippet(prop: Property): string | null {
 }
 
 function mapToJsonSnippet(source: string, prop: Property): string {
-  // Handle array of maps
+  // Extract map's value type, handling both direct and array cases
+  const valueType = prop.additionalProperties?.items || prop.additionalProperties;
+  if (!valueType) return `mapToJson(${source}, (v) => v)`;
+
+  // Generate converter based on value type
+  const valueConverter = buildValueConverter(valueType as Property);
+  
+  // Handle arrays
   if (prop.additionalProperties?.items) {
-    const baseP = prop.additionalProperties.items as Property;
-    const baseRef = getBaseRef(baseP);
-
-    // If the array contains maps
-    if (helpers.isMap(baseP)) {
-      const valueP = baseP.additionalProperties as Property;
-      const valueRef = getBaseRef(valueP);
-
-      // For non-primitive map values
-      if (!helpers.isPrimitive(valueP)) {
-        return `mapToJson(${source}, (arr) => arr.map((v) => 
-          mapToJson(v, ${valueRef}.toJson)))`;
-      }
-
-      // For primitive map values (like strings, numbers)
-      return `mapToJson(${source}, (arr) => arr.map((v) => 
-        mapToJson(v, (vv) => vv)))`;
-    }
-    
-    // Handle array of non-map objects
-    if (!helpers.isPrimitive(baseP)) {
-      return `mapToJson(${source}, (arr) => arr.map((v) => ${baseRef}.toJson(v)))`;
-    }
-
-    // Handle array of primitives
-    return `mapToJson(${source}, (arr) => arr.map((v) => v))`;
+    return `mapToJson(${source}, (arr) => arr.map((v) => ${valueConverter}(v)))`;
   }
 
-  // Handle base case (simple map)
-  const baseP = prop.additionalProperties as Property;
-  const baseRef = getBaseRef(baseP);
+  // Handle simple maps
+  return `mapToJson(${source}, ${valueConverter})`;
+}
 
-  if (!helpers.isPrimitive(baseP)) {
-    return `mapToJson(${source}, ${baseRef}.toJson)`;
+function buildValueConverter(prop: Property): string {
+  // Handle nested maps
+  if (helpers.isMap(prop)) {
+    const innerValueType = prop.additionalProperties as Property;
+    const valueRef = getBaseRef(innerValueType);
+
+    if (!helpers.isPrimitive(innerValueType)) {
+      return `(v) => mapToJson(v, ${valueRef}.toJson)`;
+    }
+    return `(v) => mapToJson(v, (vv) => vv)`;
   }
 
-  return `mapToJson(${source}, (v) => v)`;
+  // Handle non-map types
+  const ref = getBaseRef(prop);
+  if (!helpers.isPrimitive(prop)) {
+    return `${ref}.toJson`;
+  }
+  return `(v) => v`;
 }
 
 // TODO: can move this helper up to shared library?

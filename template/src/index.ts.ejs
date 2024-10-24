@@ -20,7 +20,7 @@ export function <%- ex.name %>(): number {
         const input: <%- toTypeScriptType(ex.input) %> = JSON.parse(Host.inputString()) 
       <% } else if (isMap(ex.input)) { -%>
         const untypedInput = JSON.parse(Host.inputString())
-        const input = <%- deserializeMapFromSource('untypedInput', ex.input) %>
+        const input = <%- mapParsingSnippet('untypedInput', ex.input) %>
       <% } else { -%>
         const untypedInput = JSON.parse(Host.inputString())
         const input = <%- toTypeScriptType(ex.input) %>.fromJson(untypedInput)
@@ -51,7 +51,7 @@ export function <%- ex.name %>(): number {
       <% } else if (isPrimitive(ex.output)) { -%>
         Host.outputString(JSON.stringify(output))
       <% } else if (isMap(ex.output)) { -%>
-        const untypedOutput = <%- serializeMapFromSource('output', ex.output) %>
+        const untypedOutput = <%- mapToJsonSnippet('output', ex.output) %>
         Host.outputString(JSON.stringify(untypedOutput))
       <% } else { -%>
         const untypedOutput = <%- toTypeScriptType(ex.output) %>.toJson(output)

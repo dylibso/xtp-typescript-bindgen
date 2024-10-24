@@ -1,5 +1,5 @@
 import ejs from 'ejs'
-import { helpers, getContext, Property, Parameter, } from "@dylibso/xtp-bindgen"
+import { helpers, getContext, Property, Parameter } from "@dylibso/xtp-bindgen"
 
 function toTypeScriptType(property: Property | Parameter): string {
   let tp
@@ -67,7 +67,7 @@ function getBaseRef(property: Property): string {
   return property.$ref?.name || ''
 }
 
-function deserializeProperty(prop: Property): string | null {
+function propertyParsingSnippet(prop: Property): string | null {
   const baseP = (prop.items ? prop.items : prop) as Property;
   const baseRef = getBaseRef(prop);
 
@@ -76,15 +76,15 @@ function deserializeProperty(prop: Property): string | null {
   } else if (isBuffer(baseP)) {
     return `cast(bufferFromJson, obj.${prop.name})`;
   } else if (helpers.isMap(prop)) {
-    return deserializeMapFromSource(`obj.${prop.name}`, prop);
+    return mapParsingSnippet(`obj.${prop.name}`, prop);
   } else if (!helpers.isPrimitive(baseP)) {
     return `cast(${baseRef}.fromJson, obj.${prop.name})`;
   }
   return null;
 }
 
-function deserializeMapFromSource(source: string, prop: Property): string {
-  // Handle array of maps
+function mapParsingSnippet(source: string, prop: Property): string {
+  // Handle map of arrays
   if (prop.additionalProperties?.items) {
     const baseP = prop.additionalProperties.items as Property;
     const baseRef = getBaseRef(baseP);
@@ -125,7 +125,7 @@ function deserializeMapFromSource(source: string, prop: Property): string {
   return `mapFromJson(${source}, (v: any) => v as ${toTypeScriptType(baseP)})`;
 }
 
-function serializeProperty(prop: Property): string | null {
+function propertyToJsonSnippet(prop: Property): string | null {
   const baseP = (prop.items ? prop.items : prop) as Property;
   const baseRef = getBaseRef(prop);
 
@@ -134,14 +134,14 @@ function serializeProperty(prop: Property): string | null {
   } else if (isBuffer(baseP)) {
     return `cast(bufferToJson, obj.${prop.name})`;
   } else if (helpers.isMap(prop)) {
-    return serializeMapFromSource(`obj.${prop.name}`, prop);
+    return mapToJsonSnippet(`obj.${prop.name}`, prop);
   } else if (!helpers.isPrimitive(baseP)) {
     return `cast(${baseRef}.toJson, obj.${prop.name})`;
   }
   return null;
 }
 
-function serializeMapFromSource(source: string, prop: Property): string {
+function mapToJsonSnippet(source: string, prop: Property): string {
   // Handle array of maps
   if (prop.additionalProperties?.items) {
     const baseP = prop.additionalProperties.items as Property;
@@ -196,10 +196,10 @@ export function render() {
     isBuffer,
     toTypeScriptType,
     getBaseRef,
-    serializeProperty,
-    serializeMapFromSource,
-    deserializeProperty,
-    deserializeMapFromSource
+    propertyToJsonSnippet,
+    mapToJsonSnippet,
+    propertyParsingSnippet,
+    mapParsingSnippet
   }
   const output = ejs.render(tmpl, ctx)
   Host.outputString(output)

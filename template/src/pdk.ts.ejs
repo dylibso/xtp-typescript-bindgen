@@ -8,21 +8,45 @@ function isNull(v: any): boolean {
 
 function cast(caster: (v: any) => any, v: any): any {
   if (isNull(v)) return v
-  if (Array.isArray(v)) return v.map(caster)
   return caster(v)
 }
 
-function dateToJson(v: Date): string {
+function castArray(caster: (v: any) => any) {
+  return (v?: Array<any>) => {
+    if (isNull(v)) return v
+    caster = cast.bind(null, caster) // bind to null-preserving logic in `cast`
+    return v!.map(caster)
+  }
+}
+
+function castMap(caster: (v: any) => any) {
+  return (v?: any) => {
+    if (isNull(v)) return v
+
+    caster = cast.bind(null, caster) // bind to null-preserving logic in `cast`
+    const newMap: any = {}
+    for (const k in v) {
+      newMap[k] = caster(v![k])
+    }
+    return newMap
+  }
+}
+
+function dateToJson(v?: Date): string | undefined | null {
+  if (v === undefined || v === null) return v
   return v.toISOString()
 }
-function dateFromJson(v: string): Date {
+function dateFromJson(v?: string): Date | undefined | null {
+  if (v === undefined || v === null) return v
   return new Date(v)
 }
 
-function bufferToJson(v: ArrayBuffer): string {
+function bufferToJson(v?: ArrayBuffer): string | undefined | null {
+  if (v === undefined || v === null) return v
   return Host.arrayBufferToBase64(v)
 }
-function bufferFromJson(v: string): ArrayBuffer {
+function bufferFromJson(v?: string): ArrayBuffer | undefined | null {
+  if (v === undefined || v === null) return v
   return Host.base64ToArrayBuffer(v)
 }
 
@@ -48,14 +72,8 @@ export class <%- schema.name %> {
     return {
       ...obj,
       <% schema.properties.forEach(p => { -%>
-        <% let baseP = p.items ? p.items : p -%>
-        <% let baseRef = p.$ref ? p.$ref.name : (p.items && p.items.$ref ? p.items.$ref.name : null)  -%>
-        <% if (isDateTime(baseP)) { -%>
-          <%- p.name -%>: cast(dateFromJson, obj.<%- p.name -%>),
-        <% } else if (isBuffer(baseP)) {-%>
-          <%- p.name -%>: cast(bufferFromJson, obj.<%- p.name -%>),
-        <% } else if (!isPrimitive(baseP)) {-%>
-          <%- p.name -%>: cast(<%- baseRef -%>.fromJson, obj.<%- p.name -%>),
+        <% if (isCastable(p.xtpType)) { -%>
+          <%- p.name -%>: cast(<%- castExpression(p.xtpType, 'From') %>, obj.<%- p.name %>),
         <% } -%>
       <% }) -%>
     }
@@ -65,26 +83,20 @@ export class <%- schema.name %> {
     return {
       ...obj,
       <% schema.properties.forEach(p => { -%>
-        <% let baseP = p.items ? p.items : p -%>
-        <% let baseRef = p.$ref ? p.$ref.name : (p.items && p.items.$ref ? p.items.$ref.name : null)  -%>
-        <% if (isDateTime(baseP)) { -%>
-          <%- p.name -%>: cast(dateToJson, obj.<%- p.name -%>),
-        <% } else if (isBuffer(baseP)) {-%>
-          <%- p.name -%>: cast(bufferToJson, obj.<%- p.name -%>),
-        <% } else if (!isPrimitive(baseP)) {-%>
-          <%- p.name -%>: cast(<%- baseRef -%>.toJson, obj.<%- p.name -%>),
+        <% if (isCastable(p.xtpType)) { -%>
+          <%- p.name -%>: cast(<%- castExpression(p.xtpType, 'To') %>, obj.<%- p.name %>),
         <% } -%>
       <% }) -%>
     }
   }
 }
-  <% } else if (schema.enum) { %>
+  <% } else if (isEnum(schema)) { %>
 
 /**
  * <%- formatCommentLine(schema.description) %>
  */
 export enum <%- schema.name %> {
-  <% schema.enum.forEach(variant => { -%>
+  <% schema.xtpType.values.forEach(variant => { -%>
     <%- variant
         // "host:foo$bar" -> "host_Foo$bar"
         .replace(/[^a-zA-Z0-9_$]+(.)?/g, (a, m) => '_' + (m ||'').toUpperCase())
@@ -115,15 +127,16 @@ export enum <%- schema.name %> {
 export function <%- imp.name %>(<%- imp.input ? `input: ${toTypeScriptType(imp.input)}` : null %>) <%- imp.output ? `:${toTypeScriptType(imp.output)}` : null %> {
 <% if (imp.input) { -%>
   <% if (isJsonEncoded(imp.input)) { -%>
-    <% if (isPrimitive(imp.input)) { %>
-      const mem = Memory.fromJsonObject(input as any)
-    <% } else { %>
-      const casted = <%- toTypeScriptType(imp.input) %>.toJson(input)
+    <% if (isObject(imp.input)) { %>
+      // we need to cast the input back into a json encodable form
+      const casted = cast(<%- castExpression(imp.input.xtpType, 'To') %>, input)
       const mem = Memory.fromJsonObject(casted)
+    <% } else { %>
+      const mem = Memory.fromJsonObject(input as any)
     <% } %>
   <% } else if (isUtf8Encoded(imp.input)) { -%>
   const mem = Memory.fromString(input as string)
-  <% } else if (imp.input.type === 'string') { -%>
+  <% } else if (isString(imp.input.type)) { -%>
   const mem = Memory.fromString(input)
   <% } else { -%>
   const mem = Memory.fromBuffer(input)
@@ -136,15 +149,16 @@ export function <%- imp.name %>(<%- imp.input ? `input: ${toTypeScriptType(imp.i
 
 <% if (imp.output) { -%>
   <% if (isJsonEncoded(imp.output)) { -%>
-    <% if (isPrimitive(imp.output)) { -%>
-      return Memory.find(ptr).readJsonObject();
-    <% } else { -%>
+    <% if (isObject(imp.output)) { -%>
+      // we need to cast the output back from its json encodable form
       const output = Memory.find(ptr).readJsonObject();
-      return <%- toTypeScriptType(imp.output) %>.fromJson(output)
+      return cast(<%- castExpression(imp.output.xtpType, 'From') %>, output)
+    <% } else { -%>
+      return Memory.find(ptr).readJsonObject();
     <% } -%>
   <% } else if (isUtf8Encoded(imp.output)) { -%>
     return Memory.find(ptr).readString();
-  <% } else if (imp.output.type === 'string') { -%>
+  <% } else if (isString(imp.output)) { -%>
     return Memory.find(ptr).readString();
   <% } else { -%>
     return Memory.find(ptr).readBytes();

@@ -1,57 +1,99 @@
 import ejs from 'ejs'
-import { helpers, getContext, Property, Parameter } from "@dylibso/xtp-bindgen"
+import { helpers, getContext, ObjectType, EnumType, ArrayType, XtpNormalizedType, MapType, Parameter, Property } from "@dylibso/xtp-bindgen"
 
-function toTypeScriptType(property: Property | Parameter): string {
-  let tp
-  if (property.$ref) {
-    tp = property.$ref.name
-  } else {
-    switch (property.type) {
-      case "string":
-        if (property.format === 'date-time') {
-          tp = 'Date'
-        } else {
-          tp = "string"
-        }
-        break
-      case "integer":
-        if (property.format === 'int64') {
-          throw Error(`We do not support format int64 yet`)
-        } else {
-          tp = "number"
-        }
-        break
-      case "number":
-        tp = "number"
-        break
-      case "boolean":
-        tp = "boolean"
-        break
-      case "object":
-        tp = "any"
-        break
-      case "array":
-        if (!property.items) {
-          tp = 'Array<any>'
-        } else {
-          // TODO this is not quite right to force cast
-          tp = `Array<${toTypeScriptType(property.items as Property)}>`
-        }
-        break
-      case "buffer":
-        tp = "ArrayBufferLike"
-        break
-    }
+function toTypeScriptTypeX(type: XtpNormalizedType): string {
+  // annotate with null if nullable 
+  const nullify = (t: string) => `${t}${type.nullable ? ' | null' : ''}`
+
+  switch (type.kind) {
+    case 'string':
+      return nullify('string')
+    case 'int32':
+    case 'float':
+    case 'double':
+    case 'byte':
+      return nullify('number')
+    case 'date-time':
+      return nullify('Date')
+    case 'boolean':
+      return nullify('boolean')
+    case 'array':
+      const arrayType = type as ArrayType
+      return nullify(`Array<${toTypeScriptTypeX(arrayType.elementType)}>`)
+    case 'buffer':
+      return nullify('ArrayBufferLike')
+    case 'object':
+      const oType = (type as ObjectType)
+      if (oType.properties?.length > 0) {
+        return nullify(oType.name)
+      } else {
+        return nullify('any')
+      }
+    case 'enum':
+      return nullify((type as EnumType).name)
+    case 'map':
+      const { keyType, valueType } = type as MapType
+      return nullify(`Record<${toTypeScriptTypeX(keyType)}, ${toTypeScriptTypeX(valueType)}>`)
+    case 'int64':
+      throw Error(`We do not support format int64 yet`)
+    default:
+      throw new Error("Cant convert property to typescript type: " + JSON.stringify(type))
   }
-
-  if (!tp) throw new Error("Cant convert property to typescript type: " + property.type)
-  if (!property.nullable) return tp
-  return `${tp} | null`
 }
 
-// TODO: can move this helper up to shared library?
-function isBuffer(property: Property | Parameter): boolean {
-  return property.type === 'buffer'
+type XtpTyped = { xtpType: XtpNormalizedType }
+
+function toTypeScriptType(property: XtpTyped): string {
+  return toTypeScriptTypeX(property.xtpType!)
+}
+
+/**
+ * Check whether this type needs to be cast or not
+ */
+function isCastable(t: XtpNormalizedType): boolean {
+  if (['date-time', 'buffer'].includes(t.kind)) return true
+
+  switch (t.kind) {
+    case 'object':
+      const oType = t as ObjectType
+      // only return true when the object has defined / typed properties
+      return (oType.properties && oType.properties.length > 0)
+    case 'array':
+      return isCastable((t as ArrayType).elementType)
+    case 'map':
+      return isCastable((t as MapType).valueType)
+    default:
+      return false
+  }
+}
+
+/**
+ * Renders the function call to cast the value
+ * Assumes the target is called `obj`
+ *
+ * Example: Assume we have a map of arrays of dates
+ *  castExpression(t, 'From') would yield:
+ *  -> cast(castMap(castArray(dateFromJson)), obj.myObj)
+ *
+ *  castExpression(t, 'To') would yield:
+ *  -> cast(castMap(castArray(dateToJson)), obj.myObj)
+ */
+function castExpression(t: XtpNormalizedType, direction: 'From' | 'To'): string {
+  switch (t.kind) {
+    case 'object':
+      const oType = t as ObjectType
+      return `${oType.name}.${direction.toLowerCase()}Json`
+    case 'array':
+      return `castArray(${castExpression((t as ArrayType).elementType, direction)})`
+    case 'map':
+      return `castMap(${castExpression((t as MapType).valueType, direction)})`
+    case 'date-time':
+      return `date${direction}Json`
+    case 'buffer':
+      return `buffer${direction}Json`
+    default:
+      throw new Error(`Type not meant to be casted ${JSON.stringify(t)}`)
+  }
 }
 
 export function render() {
@@ -59,7 +101,8 @@ export function render() {
   const ctx = {
     ...getContext(),
     ...helpers,
-    isBuffer,
+    isCastable,
+    castExpression,
     toTypeScriptType,
   }
   const output = ejs.render(tmpl, ctx)

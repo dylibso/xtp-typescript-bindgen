@@ -13,11 +13,11 @@ export function <%- ex.name %>(): number {
     <% if (isJsonEncoded(ex.input)) { -%>
       <% if (isBuffer(ex.input)) { -%>
         const input: <%- toTypeScriptType(ex.input) %> = Host.base64ToArrayBuffer(JSON.parse(Host.inputString()))
-      <% } else if (isPrimitive(ex.input)) { -%>
-        const input: <%- toTypeScriptType(ex.input) %> = JSON.parse(Host.inputString())
-      <% } else { -%>
+      <% } else if (isObject(ex.input)) { -%>
         const untypedInput = JSON.parse(Host.inputString())
         const input = <%- toTypeScriptType(ex.input) %>.fromJson(untypedInput)
+      <% } else { -%>
+        const input: <%- toTypeScriptType(ex.input) %> = JSON.parse(Host.inputString())
       <% } -%>
     <% } else if (ex.input.type === 'string') { -%>
       const input = Host.inputString() <%- (ex.input.$ref && ex.input.$ref.enum) ? `as ${ex.input.$ref.name}` : "" %>
@@ -42,11 +42,11 @@ export function <%- ex.name %>(): number {
     <% if (isJsonEncoded(ex.output)) { -%>
       <% if (isBuffer(ex.output)) { -%>
         Host.outputString(JSON.stringify(Host.arrayBufferToBase64(output)))
-      <% } else if (isPrimitive(ex.output)) { -%>
-        Host.outputString(JSON.stringify(output))
-      <% } else { -%>
+      <% } else if (isObject(ex.output)) { -%>
         const untypedOutput = <%- toTypeScriptType(ex.output) %>.toJson(output)
         Host.outputString(JSON.stringify(untypedOutput))
+      <% } else { -%>
+        Host.outputString(JSON.stringify(output))
       <% } -%>
     <% } else if (ex.output.type === 'string') { -%>
       Host.outputString(output)

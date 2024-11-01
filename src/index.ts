@@ -1,5 +1,5 @@
 import ejs from 'ejs'
-import { helpers, getContext, ObjectType, EnumType, ArrayType, XtpNormalizedType, MapType, Parameter, Property } from "@dylibso/xtp-bindgen"
+import { helpers, getContext, ObjectType, EnumType, ArrayType, XtpNormalizedType, MapType, XtpTyped } from "@dylibso/xtp-bindgen"
 
 function toTypeScriptTypeX(type: XtpNormalizedType): string {
   // annotate with null if nullable 
@@ -40,8 +40,6 @@ function toTypeScriptTypeX(type: XtpNormalizedType): string {
       throw new Error("Cant convert property to typescript type: " + JSON.stringify(type))
   }
 }
-
-type XtpTyped = { xtpType: XtpNormalizedType }
 
 function toTypeScriptType(property: XtpTyped): string {
   return toTypeScriptTypeX(property.xtpType!)

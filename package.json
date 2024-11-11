@@ -17,7 +17,7 @@
     "typescript": "^5.3.2"
   },
   "dependencies": {
-    "@dylibso/xtp-bindgen": "1.0.0-rc.13",
+    "@dylibso/xtp-bindgen": "1.0.0-rc.15",
     "ejs": "^3.1.10"
   }
 }

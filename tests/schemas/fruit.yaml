@@ -47,10 +47,10 @@ exports:
     codeSamples:
     - lang: typescript
       source: |
-        return { ghost: GhostGang.inky, aBoolean: true, aString: "okay", anInt: 123 }
+        return input
     input:
       contentType: application/json
-      $ref: "#/components/schemas/Fruit"
+      $ref: "#/components/schemas/ComplexObject"
     output:
       contentType: application/json
       $ref: "#/components/schemas/ComplexObject"
@@ -109,12 +109,22 @@ components:
       - clyde
       description: A set of all the enemies of pac-man
     ComplexObject:
+      required:
+        - arrayOfDate
       properties:
         arrayOfDate:
           type: array
           items:
             type: string
             format: date-time
+        arrayOfEnum:
+          type: array
+          items:
+            "$ref": "#/components/schemas/GhostGang"
+        arrayOfObjects:
+          type: array
+          items:
+            "$ref": "#/components/schemas/WriteParams"
         ghost:
           "$ref": "#/components/schemas/GhostGang"
           description: I can override the description for the property here
@@ -138,4 +148,34 @@ components:
         writeParams:
           "$ref": "#/components/schemas/WriteParams"
           nullable: true
+        aStringMap:
+          type: string
+          additionalProperties:
+            type: string
+        aWriteParamMap:
+          type: string
+          additionalProperties:
+            "$ref": "#/components/schemas/WriteParams"
+        aNullableWriteParamMap:
+          type: string
+          nullable: true
+          additionalProperties:
+            "$ref": "#/components/schemas/WriteParams"
+        aBuffer:
+          type: buffer
+          nullable: true
+        aMapOfDateArrays:
+          description: a string map
+          additionalProperties:
+            items:
+              type: string
+              format: date-time
+        aMapOfArraysOfMapsOfNullableDates:
+          description: a deep map
+          additionalProperties:
+            items:
+              additionalProperties:
+                nullable: true
+                type: string
+                format: date-time
       description: A complex json object

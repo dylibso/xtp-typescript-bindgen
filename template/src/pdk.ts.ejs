@@ -51,7 +51,7 @@ function bufferFromJson(v?: string): ArrayBuffer | undefined | null {
 }
 
 <% Object.values(schema.schemas).forEach(schema => { %>
-  <% if (schema.properties.length > 0) { %>
+  <% if (isObject(schema)) { %>
 
 /**
  * <%- formatCommentBlock(schema.description) %>

@@ -84,3 +84,4 @@ if ! command_exists extism-js; then
   exit 1
 fi
 
+npm install

@@ -80,6 +80,10 @@ export class <%- schema.name %> {
   }
 
   static toJson(obj: <%- schema.name %>): any{
+    if (!obj) {
+      return null
+    }
+
     return {
       ...obj,
       <% schema.properties.forEach(p => { -%>
@@ -148,21 +152,31 @@ export function <%- imp.name %>(<%- imp.input ? `input: ${toTypeScriptType(imp.i
 <% } -%>
 
 <% if (imp.output) { -%>
+  const outputMemory = Memory.find(ptr);
+  if (isEmpty(outputMemory)) {
+    // @ts-ignore
+    return null;
+  }
+
   <% if (isJsonEncoded(imp.output)) { -%>
     <% if (isObject(imp.output)) { -%>
       // we need to cast the output back from its json encodable form
-      const output = Memory.find(ptr).readJsonObject();
+      const output = outputMemory.readJsonObject();
       return cast(<%- castExpression(imp.output.xtpType, 'From') %>, output)
     <% } else { -%>
-      return Memory.find(ptr).readJsonObject();
+      return outputMemory.readJsonObject();
     <% } -%>
   <% } else if (isUtf8Encoded(imp.output)) { -%>
-    return Memory.find(ptr).readString();
+    return outputMemory.readString();
   <% } else if (isString(imp.output)) { -%>
-    return Memory.find(ptr).readString();
+    return outputMemory.readString();
   <% } else { -%>
-    return Memory.find(ptr).readBytes();
+    return outputMemory.readBytes();
   <% } -%>
 <% } %>
 }
 <% }) %>
+
+function isEmpty(mem: MemoryHandle | undefined): boolean {
+  return !mem || !mem.offset;
+}

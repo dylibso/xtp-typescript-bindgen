@@ -45,6 +45,42 @@ function toTypeScriptType(property: XtpTyped): string {
   return toTypeScriptTypeX(property.xtpType!)
 }
 
+function getDefault(property: XtpTyped): string {
+  return getDefaultForType(property.xtpType!)
+}
+
+function getDefaultForType(type: XtpNormalizedType): string {
+  if (type.nullable) return 'null';
+
+  switch (type.kind) {
+    case 'string':
+      return "''"
+    case 'int32':
+    case 'float':
+    case 'double':
+    case 'byte':
+      return '0'
+    case 'date-time':
+      return 'new Date()'
+    case 'boolean':
+      return 'false'
+    case 'array':
+      return '[]'
+    case 'buffer':
+      return 'new ArrayBuffer(0)'
+    case 'object':
+      return 'new ' + (type as ObjectType).name + '()'
+    case 'enum':
+      return (type as EnumType).values[0]
+    case 'map':
+      return '{}'
+    case 'int64':
+      throw 'new BigInt(0)';
+    default:
+      throw new Error("Cant convert property to typescript type: " + JSON.stringify(type))
+  }
+}
+
 /**
  * Check whether this type needs to be cast or not
  */
@@ -102,6 +138,8 @@ export function render() {
     isCastable,
     castExpression,
     toTypeScriptType,
+    getDefaultForType,
+    getDefault,
   }
   const output = ejs.render(tmpl, ctx)
   Host.outputString(output)

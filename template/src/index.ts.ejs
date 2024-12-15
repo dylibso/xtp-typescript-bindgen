@@ -11,14 +11,20 @@ import {
 export function <%- ex.name %>(): number {
   <% if (ex.input) { -%>
     <% if (isJsonEncoded(ex.input)) { -%>
-      <% if (isBuffer(ex.input)) { -%>
-        const input: <%- toTypeScriptType(ex.input) %> = Host.base64ToArrayBuffer(JSON.parse(Host.inputString()))
-      <% } else if (isObject(ex.input)) { -%>
-        const untypedInput = JSON.parse(Host.inputString())
-        const input = <%- toTypeScriptType(ex.input) %>.fromJson(untypedInput)
-      <% } else { -%>
-        const input: <%- toTypeScriptType(ex.input) %> = JSON.parse(Host.inputString())
-      <% } -%>
+      const jsonInput = Host.inputString()
+
+      let input: <%- toTypeScriptType(ex.input) %> = <%- getDefault(ex.input) %>;
+
+      if (jsonInput) {
+        <% if (isBuffer(ex.input)) { -%>
+          input = Host.base64ToArrayBuffer(JSON.parse(Host.inputString()))
+        <% } else if (isObject(ex.input)) { -%>
+          const untypedInput = JSON.parse(Host.inputString())
+          input = <%- toTypeScriptType(ex.input) %>.fromJson(untypedInput)
+        <% } else { -%>
+          input = JSON.parse(Host.inputString())
+        <% } -%>
+      }
     <% } else if (ex.input.type === 'string') { -%>
       const input = Host.inputString() <%- (ex.input.$ref && ex.input.$ref.enum) ? `as ${ex.input.$ref.name}` : "" %>
     <% } else { -%>

@@ -29,10 +29,10 @@ case $1 in
     # Using ../../bundle so we test the bindgen template
     PLUGIN_NAME=exampleplugin
     echo "generating initial plugin code in '$(pwd)/$PLUGIN_NAME'..."
-    xtp plugin init --schema-file schema.yaml --template ../../bundle --path $PLUGIN_NAME --name $PLUGIN_NAME --feature stub-with-code-samples
+    xtp plugin init --schema-file schema.yaml --template ../../bundle --path $PLUGIN_NAME --name $PLUGIN_NAME --feature stub-with-code-samples --yes
     echo "building '$PLUGIN_NAME'..."
     xtp plugin build --path $PLUGIN_NAME
     echo "testing '$PLUGIN_NAME'..."
-    xtp plugin test $PLUGIN_NAME/dist/plugin.wasm --with test.wasm --mock-host mock.wasm
+    xtp plugin test $PLUGIN_NAME/dist/plugin.wasm --with test.wasm --mock-host mock.wasm --log-level debug
   ;;
 esac

@@ -50,6 +50,8 @@ export function <%- ex.name %>(): number {
       <% } -%>
     <% } else if (ex.output.type === 'string') { -%>
       Host.outputString(output)
+    <% } else if (ex.output.type === 'number') { -%>
+      Host.outputBytes(Float32Array.of(output).buffer)
     <% } else { -%>
       Host.outputBytes(output)
     <% } -%>
@@ -59,4 +61,3 @@ export function <%- ex.name %>(): number {
 }
 
 <% }) %>
-

@@ -15,7 +15,7 @@ jobs:
 
       - name: Setup Extism and XTP
         run: |
-          curl https://raw.githubusercontent.com/extism/js-pdk/main/install.sh v1.3.3 | bash
+          curl https://raw.githubusercontent.com/extism/js-pdk/main/install.sh | bash -s v1.3.3
           curl https://static.dylibso.com/cli/install.sh | bash
 
       - name: Set up Node.js
@@ -38,7 +38,7 @@ jobs:
       - name: Run Bindgen Test
         run: |
           extism-js --version
-          
+
           # we already have a folder named bundle
           # move it before we get the simulation bundle
           # TODO change the name

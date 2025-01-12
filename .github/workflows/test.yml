@@ -37,6 +37,8 @@ jobs:
 
       - name: Run Bindgen Test
         run: |
+          extism-js --version
+          
           # we already have a folder named bundle
           # move it before we get the simulation bundle
           # TODO change the name

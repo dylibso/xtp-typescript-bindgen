@@ -13,7 +13,8 @@
     "esModuleInterop": true, // Enables compatibility with Babel-style module imports
     "skipLibCheck": true, // Skip type checking of declaration files
     "allowJs": true, // Allow JavaScript files to be compiled
-    "noEmit": true // Do not emit outputs (no .js or .d.ts files)
+    "noEmit": true, // Do not emit outputs (no .js or .d.ts files)
+    "resolveJsonModule": true // Automatically resolve .json imports
   },
   "include": [
     "src/**/*.ts" // Include all TypeScript files in src directory

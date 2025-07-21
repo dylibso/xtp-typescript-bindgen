@@ -11,8 +11,9 @@ This is a template for creating an XTP plugin (using the Extism framework). The 
 ### Key Components
 
 - **src/index.ts**: Generated glue code that bridges the host application with your plugin implementation
-- **src/main.ts**: **Your implementation file** - contains `callImpl()` and `describeImpl()` functions where you write your plugin logic
-- **src/pdk.ts**: Internal library for interfacing with the host application (not type definitions)
+- **src/index.d.ts**: The Extism interface. Describes the wasm boundary b/w the host and the guest plugin
+- **src/main.ts**: **Your implementation file** - contains the exported functions where you write your plugin logic
+- **src/pdk.ts**: Internal library and types for interfacing with the host application
 - **xtp.toml**: Configuration with app/extension point IDs and build scripts
 
 ### JavaScript Runtime Constraints
@@ -49,12 +50,12 @@ The plugin runs in a bare-bones QuickJS environment with significant limitations
 - `Var.getBytes(name: string): ArrayBufferLike | null` - Retrieve bytes value
 
 #### Console API
-- `Console.log(...data: any[]): void` - Log messages
-- `Console.debug(...data: any[]): void` - Debug messages
-- `Console.info(...data: any[]): void` - Info messages
-- `Console.warn(...data: any[]): void` - Warning messages
-- `Console.error(...data: any[]): void` - Error messages
-- `Console.trace(...data: any[]): void` - Trace messages
+- `console.log(...data: any[]): void` - Log messages
+- `console.debug(...data: any[]): void` - Debug messages
+- `console.info(...data: any[]): void` - Info messages
+- `console.warn(...data: any[]): void` - Warning messages
+- `console.error(...data: any[]): void` - Error messages
+- `console.trace(...data: any[]): void` - Trace messages
 
 ## Development Commands
 
@@ -72,19 +73,13 @@ npm run format
 
 ### Testing with xtp plugin call
 
-This plugin template has two main functions:
+Any of the exported functions can be called with `xtp plugin call`
 
 ```bash
-# Get the server description (available tools/resources)
-xtp plugin call --wasi dist/plugin.wasm describe
-
-# Call a specific tool (basic example)
-xtp plugin call --wasi dist/plugin.wasm call -i '{"params": {"arguments": {"name": "World"}}}'
-
-# Call a tool that requires network access (like IP address fetching)
-xtp plugin call --wasi --allow-host "api.ipify.org" dist/plugin.wasm call -i '{"params": {"arguments": {}}}'
+# Call the exported function "greet" with the string input "Benjamin"
+xtp plugin call --wasi dist/plugin.wasm greet --input "Benjamin"
+# => Hello, Benjamin!
 ```
-
 **Important**: When testing plugins that make HTTP requests, you must use the `--allow-host` flag to specify which domains the plugin can access. Without this flag, all HTTP requests will be blocked in the sandbox environment.
 
 ### Prerequisites Check
@@ -114,11 +109,11 @@ The final output is `dist/plugin.wasm`.
 
 ### Runtime Constraints
 - **No async/await**: Use synchronous APIs only (Http.request, not fetch)
-- **No Node.js APIs**: Use provided APIs (Console.log, not console.log)
+- **No Node.js APIs**: Use provided APIs (Http.request, not not fetch)
 - **CommonJS only**: Use `module.exports` and `require()`, not ES6 imports/exports in bundled code
 - **Memory limitations**: Avoid large data structures, use streaming where possible
 
 ### File Structure
-- **Don't edit index.ts**: This is generated glue code - implement your logic in main.ts
-- **Use existing types**: Import types from "./pdk" for CallToolRequest, CallToolResult, etc.
-- **Follow the interface**: Implement `callImpl(input: CallToolRequest)` and `describeImpl()` in main.ts
+- **Don't edit index.ts or index.d.ts**: This is generated glue code - implement your logic in main.ts
+- **Use existing types**: Import types defined in "./pdk" for arguments, returns, etc.
+- **Follow the interface**: Implement the functions present in main.ts according to index.d.ts
